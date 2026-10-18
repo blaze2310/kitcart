@@ -1,5 +1,4 @@
-
-import RobotVideo from "@/components/mascot/robot-video";
+import RobotCanvas from "@/components/mascot/robot-canvas";
 import { Sparkles } from "lucide-react";
 
 export default function Home() {
@@ -10,8 +9,8 @@ export default function Home() {
         YOUR SHOPPING BUDDY
       </div>
 
-      <div className="aspect-[16/15] w-full max-w-[470px]">
-        <RobotVideo />
+      <div className="aspect-[16/15] w-full max-w-[470px] overflow-hidden rounded-[28px] border border-white/10">
+        <RobotCanvas />
       </div>
 
       <h1 className="mt-8 text-5xl font-bold tracking-tight">

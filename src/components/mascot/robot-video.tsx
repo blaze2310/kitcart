@@ -17,13 +17,12 @@ export default function RobotVideo() {
   const [error, setError] = useState(false);
 
   // ---- CALIBRATION ----
-  // These are percentages of the whole video duration.
-  // Adjust CENTER_PROGRESS if the face still looks too much left/right at center.
+  // Percentages of the total video duration.
   const MIN_PROGRESS = 0.08;
   const CENTER_PROGRESS = 0.18;
   const MAX_PROGRESS = 0.52;
 
-  // Lower fps cap = less lag, but less responsive.
+  // Animation tuning.
   const SEEK_FPS = 18;
   const SMOOTHING = 0.14;
   const SEEK_EPSILON = 1 / 24;
@@ -34,25 +33,35 @@ export default function RobotVideo() {
 
     const handleMouseMove = (event: PointerEvent) => {
       const x = event.clientX / window.innerWidth;
+
       targetRef.current = clamp(x, 0, 1);
     };
 
     const animate = (now: number) => {
       const video = videoRef.current;
 
+      // Smooth cursor movement.
       currentRef.current +=
         (targetRef.current - currentRef.current) * SMOOTHING;
 
       const x = currentRef.current;
 
-      // Piecewise mapping:
-      // mouse center -> CENTER_PROGRESS
+      // Map cursor position to video progress.
+      // Cursor center corresponds to CENTER_PROGRESS.
       let progress = CENTER_PROGRESS;
 
       if (x <= 0.5) {
-        progress = lerp(MIN_PROGRESS, CENTER_PROGRESS, x / 0.5);
+        progress = lerp(
+          MIN_PROGRESS,
+          CENTER_PROGRESS,
+          x / 0.5
+        );
       } else {
-        progress = lerp(CENTER_PROGRESS, MAX_PROGRESS, (x - 0.5) / 0.5);
+        progress = lerp(
+          CENTER_PROGRESS,
+          MAX_PROGRESS,
+          (x - 0.5) / 0.5
+        );
       }
 
       if (
@@ -61,19 +70,25 @@ export default function RobotVideo() {
         Number.isFinite(video.duration) &&
         video.duration > 0
       ) {
-        const desiredTime = clamp(progress * video.duration, 0.01, video.duration - 0.01);
+        const desiredTime = clamp(
+          progress * video.duration,
+          0.01,
+          video.duration - 0.01
+        );
 
-        const enoughTimePassed = now - lastSeekMs >= 1000 / SEEK_FPS;
+        const enoughTimePassed =
+          now - lastSeekMs >= 1000 / SEEK_FPS;
+
         const enoughDifference =
-          Math.abs(video.currentTime - desiredTime) > SEEK_EPSILON;
+          Math.abs(video.currentTime - desiredTime) >
+          SEEK_EPSILON;
 
-        if (!video.seeking && enoughTimePassed && enoughDifference) {
-          if ("fastSeek" in video) {
-            // @ts-expect-error browser support varies
-            video.fastSeek(desiredTime);
-          } else {
-            video.currentTime = desiredTime;
-          }
+        if (
+          !video.seeking &&
+          enoughTimePassed &&
+          enoughDifference
+        ) {
+          video.currentTime = desiredTime;
           lastSeekMs = now;
         }
       }
@@ -81,14 +96,22 @@ export default function RobotVideo() {
       animationFrame = requestAnimationFrame(animate);
     };
 
-    window.addEventListener("pointermove", handleMouseMove, {
-      passive: true,
-    });
+    window.addEventListener(
+      "pointermove",
+      handleMouseMove,
+      {
+        passive: true,
+      }
+    );
 
     animationFrame = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("pointermove", handleMouseMove);
+      window.removeEventListener(
+        "pointermove",
+        handleMouseMove
+      );
+
       cancelAnimationFrame(animationFrame);
     };
   }, []);
@@ -110,10 +133,12 @@ export default function RobotVideo() {
           className="h-full w-full object-cover"
           onLoadedMetadata={(event) => {
             const video = event.currentTarget;
+
             video.pause();
 
-            // Start from centered face instead of midpoint
-            video.currentTime = video.duration * CENTER_PROGRESS;
+            // Start with the robot facing the center.
+            video.currentTime =
+              video.duration * CENTER_PROGRESS;
           }}
           onError={() => setError(true)}
         />
