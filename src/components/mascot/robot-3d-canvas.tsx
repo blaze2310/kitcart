@@ -22,22 +22,44 @@ import { MathUtils } from "three";
 
 const MODEL_PATH = "/models/kitcart/kitcart-rig-test.glb";
 
-// Maximum head movement in degrees
+// Cursor tracking
 const MAX_LEFT_RIGHT = 16;
 const MAX_UP_DOWN = 10;
 const MAX_SIDE_TILT = 2;
 
-// Smoothness
 const FOLLOW_SPEED = 5;
-
-// Return to neutral after 1.5 seconds of no movement
 const IDLE_TIMEOUT_MS = 1500;
+
+// Idle gestures
+const NOD_DEGREES = 6;
+
+// Confused/curious gesture:
+// Sideways + downward + slight horizontal turn.
+const CURIOUS_TILT_DEGREES = 8;
+const CURIOUS_DOWN_DEGREES = 7;
+const CURIOUS_TURN_DEGREES = 2;
+
+const NOD_DURATION = 1.1;
+const CURIOUS_DURATION = 2.2;
+
+const FIRST_GESTURE_DELAY = 5;
+const BETWEEN_GESTURES_DELAY = 7;
 
 type CursorTarget = {
   x: number;
   y: number;
   active: boolean;
   lastMovedAt: number;
+};
+
+type GestureName = "nod" | "curious";
+
+type IdleState = {
+  nextGestureAt: number;
+  gestureStartedAt: number | null;
+  currentGesture: GestureName | null;
+  nextGesture: GestureName;
+  wasTracking: boolean;
 };
 
 function KitCartRig({
@@ -47,7 +69,6 @@ function KitCartRig({
 }) {
   const { scene } = useGLTF(MODEL_PATH);
 
-  // Protect cached GLB scene
   const rig = useMemo(() => scene.clone(true), [scene]);
 
   const headPivot = useMemo(() => {
@@ -64,7 +85,7 @@ function KitCartRig({
       );
     }
 
-    console.info("KitCart head tracking initialized", {
+    console.info("KitCart gesture system ready", {
       head: head.name,
       body: body.name,
       pivot: pivot.name,
@@ -78,51 +99,146 @@ function KitCartRig({
     [headPivot]
   );
 
-  useFrame((_, delta) => {
+  const idle = useRef<IdleState>({
+    nextGestureAt: FIRST_GESTURE_DELAY,
+    gestureStartedAt: null,
+    currentGesture: null,
+    nextGesture: "nod",
+    wasTracking: false,
+  });
+
+  useFrame(({ clock }, delta) => {
+    const elapsed = clock.elapsedTime;
     const target = cursor.current;
+    const animation = idle.current;
 
     const recentlyMoved =
       target.active &&
       performance.now() - target.lastMovedAt <
         IDLE_TIMEOUT_MS;
 
+    // Moving the cursor cancels idle animations.
+    if (recentlyMoved) {
+      animation.currentGesture = null;
+      animation.gestureStartedAt = null;
+
+      animation.nextGestureAt =
+        elapsed + FIRST_GESTURE_DELAY;
+    } else if (animation.wasTracking) {
+      animation.nextGestureAt =
+        elapsed + FIRST_GESTURE_DELAY;
+    }
+
+    animation.wasTracking = recentlyMoved;
+
     const x = recentlyMoved ? target.x : 0;
     const y = recentlyMoved ? target.y : 0;
 
-    // Horizontal: reverse previous tracking direction
-    const targetYaw =
+    let yaw =
       neutralRotation.y -
       MathUtils.degToRad(MAX_LEFT_RIGHT) * x;
 
-    // Vertical: cursor up means head looks up
-    const targetPitch =
+    let pitch =
       neutralRotation.x -
       MathUtils.degToRad(MAX_UP_DOWN) * y;
 
-    // Subtle expressive tilt
-    const targetRoll =
+    let roll =
       neutralRotation.z -
       MathUtils.degToRad(MAX_SIDE_TILT) * x;
 
-    // Frame-rate-independent smoothing
-    const smoothing =
-      1 - Math.exp(-FOLLOW_SPEED * delta);
+    if (!recentlyMoved) {
+      if (
+        animation.currentGesture === null &&
+        elapsed >= animation.nextGestureAt
+      ) {
+        animation.currentGesture = animation.nextGesture;
+        animation.gestureStartedAt = elapsed;
+      }
 
-    headPivot.rotation.y = MathUtils.lerp(
-      headPivot.rotation.y,
-      targetYaw,
-      smoothing
-    );
+      if (
+        animation.currentGesture !== null &&
+        animation.gestureStartedAt !== null
+      ) {
+        const gesture = animation.currentGesture;
+
+        const duration =
+          gesture === "nod"
+            ? NOD_DURATION
+            : CURIOUS_DURATION;
+
+        const progress =
+          (elapsed - animation.gestureStartedAt) /
+          duration;
+
+        if (progress >= 1) {
+          animation.currentGesture = null;
+          animation.gestureStartedAt = null;
+
+          animation.nextGesture =
+            gesture === "nod" ? "curious" : "nod";
+
+          animation.nextGestureAt =
+            elapsed + BETWEEN_GESTURES_DELAY;
+        } else {
+          const strength = Math.sin(
+            Math.PI * MathUtils.clamp(progress, 0, 1)
+          );
+
+          if (gesture === "nod") {
+            // Gentle downward-and-upward nod.
+            pitch +=
+              MathUtils.degToRad(NOD_DEGREES) *
+              strength;
+          }
+
+          if (gesture === "curious") {
+            // Confused expression:
+            // Diagonal sideways-and-downward head tilt.
+
+            // Tilt head toward one shoulder.
+            roll +=
+              MathUtils.degToRad(
+                CURIOUS_TILT_DEGREES
+              ) * strength;
+
+            // Lower the face simultaneously.
+            // Positive pitch matches the existing nod.
+            pitch +=
+              MathUtils.degToRad(
+                CURIOUS_DOWN_DEGREES
+              ) * strength;
+
+            // Slight accompanying horizontal turn.
+            yaw +=
+              MathUtils.degToRad(
+                CURIOUS_TURN_DEGREES
+              ) * strength;
+          }
+        }
+      }
+    }
+
+    // Smooth movement independent of frame rate.
+    const safeDelta = Math.min(delta, 0.05);
+
+    const smoothing =
+      1 - Math.exp(-FOLLOW_SPEED * safeDelta);
 
     headPivot.rotation.x = MathUtils.lerp(
       headPivot.rotation.x,
-      targetPitch,
+      pitch,
+      smoothing
+    );
+
+    headPivot.rotation.y = MathUtils.lerp(
+      headPivot.rotation.y,
+      yaw,
       smoothing
     );
 
     headPivot.rotation.z = MathUtils.lerp(
       headPivot.rotation.z,
-      targetRoll,
+      roll,
       smoothing
     );
   });
@@ -140,12 +256,9 @@ export default function Robot3DCanvas() {
 
   useEffect(() => {
     function handleMouseMove(event: MouseEvent) {
-      // Normalize cursor to the entire browser viewport.
-      // Left = -1, right = +1.
       const horizontal =
         (event.clientX / window.innerWidth) * 2 - 1;
 
-      // Top = +1, bottom = -1.
       const vertical =
         1 - (event.clientY / window.innerHeight) * 2;
 
@@ -166,8 +279,6 @@ export default function Robot3DCanvas() {
     }
 
     function handleMouseLeave(event: MouseEvent) {
-      // Only reset when the mouse leaves the
-      // browser document, not a child element.
       if (event.relatedTarget === null) {
         cursor.current.active = false;
       }
@@ -230,7 +341,6 @@ export default function Robot3DCanvas() {
     <div className="relative h-full w-full overflow-hidden bg-[#11142B]">
       <Canvas
         camera={{
-          // Straight-on front view
           position: [0, 0.75, 6],
           fov: 35,
           near: 0.01,
@@ -248,7 +358,7 @@ export default function Robot3DCanvas() {
           args={["#11142B"]}
         />
 
-        {/* Studio lighting */}
+        {/* Existing studio lighting */}
         <ambientLight intensity={1.8} />
 
         <hemisphereLight
@@ -273,7 +383,7 @@ export default function Robot3DCanvas() {
           color="#ffffff"
         />
 
-        {/* Manual camera inspection remains available */}
+        {/* Manual model inspection */}
         <OrbitControls
           makeDefault
           enablePan={false}
@@ -293,7 +403,7 @@ export default function Robot3DCanvas() {
       </Canvas>
 
       <div className="pointer-events-none absolute bottom-4 left-0 right-0 text-center text-xs text-white/60">
-        KitCart V2 · Full-window cursor tracking
+        KitCart V2 · Cursor tracking + idle personality
       </div>
     </div>
   );
