@@ -8,6 +8,11 @@ import RobotFace, {
   EXPRESSIONS,
 } from "./robot-face";
 
+import RobotGestureRenderer from "./robot-gesture-renderer";
+
+import type { RobotGesture } from "./robot-animation.types";
+import { ROBOT_PRIORITY } from "./robot-animation.types";
+
 import { useRobotGaze } from "./hooks/use-robot-gaze";
 import { useRobotBlink } from "./hooks/use-robot-blink";
 import { useRobotIdle } from "./hooks/use-robot-idle";
@@ -20,8 +25,6 @@ import {
   FADE_IN_MS,
 } from "./hooks/use-robot-expression";
 
-import { ROBOT_PRIORITY } from "./robot-animation.types";
-
 const IMAGE_WIDTH = 1142;
 const IMAGE_HEIGHT = 1378;
 
@@ -31,8 +34,6 @@ export default function RobotCanvas() {
 
   const { isIdle, idleTilt } = useRobotIdle();
 
-  // The controller is now the source of truth
-  // for expressions and coordinated reactions.
   const {
     animationState,
     baseExpression,
@@ -41,14 +42,10 @@ export default function RobotCanvas() {
     requestReaction,
   } = useRobotController();
 
-  // This hook now only animates the controller's
-  // selected facial expression.
   const {
     displayExpression,
     faceVisible,
-  } = useRobotExpression(
-    animationState.expression
-  );
+  } = useRobotExpression(animationState.expression);
 
   const {
     nodding,
@@ -63,8 +60,6 @@ export default function RobotCanvas() {
     selectExpression,
   });
 
-  // Idle controls the resting expression.
-  // It cannot override an active reaction.
   useEffect(() => {
     setIdleMode(isIdle);
   }, [isIdle, setIdleMode]);
@@ -78,21 +73,32 @@ export default function RobotCanvas() {
     animationState.activeReaction.source ===
       "interaction";
 
+  // Select the current head gesture.
+  const activeGesture: RobotGesture = isReacting
+    ? "nod"
+    : isIdle
+      ? "curious-tilt"
+      : "none";
+
+  const activeIdleTilt =
+    activeGesture === "curious-tilt"
+      ? idleTilt
+      : 0;
+
+  const nodOffset =
+    activeGesture === "nod" && nodding
+      ? 12
+      : 0;
+
+  // Shared full-body movement.
+  // Zero for now: no visible bounce is introduced.
+  const bodyOffsetY = 0;
+
   // Approved cursor tracking.
   const headX = gaze.x * 22;
   const headY = gaze.y * 15;
   const headRotation = gaze.x * 4.8;
 
-  // Preserve idle head movement, but never let it
-  // compete with an active interaction.
-  const activeIdleTilt =
-    isIdle && !isReacting && !nodding
-      ? idleTilt
-      : 0;
-
-  const nodOffset = nodding ? 12 : 0;
-
-  // Approved facial tracking.
   const eyeX = gaze.x * 8;
   const eyeY = gaze.y * 5;
 
@@ -102,9 +108,6 @@ export default function RobotCanvas() {
   const gazeTransform =
     `translate(${headX} ${headY}) ` +
     `rotate(${headRotation} 560 600)`;
-
-  const idleTransform =
-    `rotate(${activeIdleTilt} 560 600)`;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[#11142B]">
@@ -130,61 +133,68 @@ export default function RobotCanvas() {
           touchAction: "manipulation",
         }}
       >
-        {/* Stationary robot body */}
-        <Image
-          src="/mascot/kitcart-body-layer.png"
-          alt="KitCart interactive robot mascot"
-          fill
-          priority
-          draggable={false}
-          sizes="(max-width: 768px) 100vw, 470px"
-          className="pointer-events-none object-contain select-none"
-        />
+        {/*
+          SHARED ROBOT MOVEMENT LAYER
 
-        <svg
-          viewBox={`0 0 ${IMAGE_WIDTH} ${IMAGE_HEIGHT}`}
-          preserveAspectRatio="xMidYMid meet"
-          className="pointer-events-none absolute inset-0 h-full w-full select-none"
-          aria-hidden="true"
+          Both the body PNG and the SVG head sit inside
+          this wrapper. A future bounce will move both
+          together without disturbing independent
+          head gestures.
+        */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translate3d(0, ${bodyOffsetY}px, 0)`,
+            transition: "transform 280ms ease-in-out",
+            willChange: "transform",
+          }}
         >
-          <defs>
-            {/* Shared cyan and pink glow */}
-            <filter
-              id={glowId}
-              x="-60%"
-              y="-100%"
-              width="220%"
-              height="300%"
-            >
-              <feGaussianBlur stdDeviation="12" />
-            </filter>
+          {/* Body layer */}
+          <Image
+            src="/mascot/kitcart-body-layer.png"
+            alt="KitCart interactive robot mascot"
+            fill
+            priority
+            draggable={false}
+            sizes="(max-width: 768px) 100vw, 470px"
+            className="pointer-events-none object-contain select-none"
+          />
 
-            {/* Keep expressions inside the visor */}
-            <clipPath id={visorId}>
-              <ellipse
-                cx="560"
-                cy="396"
-                rx="255"
-                ry="162"
-              />
-            </clipPath>
-          </defs>
+          {/* Head and facial layers */}
+          <svg
+            viewBox={`0 0 ${IMAGE_WIDTH} ${IMAGE_HEIGHT}`}
+            preserveAspectRatio="xMidYMid meet"
+            className="pointer-events-none absolute inset-0 h-full w-full select-none"
+            aria-hidden="true"
+          >
+            <defs>
+              <filter
+                id={glowId}
+                x="-60%"
+                y="-100%"
+                width="220%"
+                height="300%"
+              >
+                <feGaussianBlur stdDeviation="12" />
+              </filter>
 
-          {/* Approved cursor-controlled head movement */}
-          <g transform={gazeTransform}>
-            {/* Idle-only curiosity tilt */}
-            <g
-              transform={idleTransform}
-              style={{
-                transition: "transform 650ms ease-in-out",
-              }}
-            >
-              {/* Interaction nod */}
-              <g
-                transform={`translate(0 ${nodOffset})`}
-                style={{
-                  transition: "transform 210ms ease-in-out",
-                }}
+              <clipPath id={visorId}>
+                <ellipse
+                  cx="560"
+                  cy="396"
+                  rx="255"
+                  ry="162"
+                />
+              </clipPath>
+            </defs>
+
+            {/* Independent cursor-driven head movement */}
+            <g transform={gazeTransform}>
+              {/* Head-only gesture renderer */}
+              <RobotGestureRenderer
+                gesture={activeGesture}
+                headTilt={activeIdleTilt}
+                nodOffset={nodOffset}
               >
                 <image
                   href="/mascot/kitcart-head-layer.png"
@@ -195,7 +205,7 @@ export default function RobotCanvas() {
                   preserveAspectRatio="xMidYMid meet"
                 />
 
-                {/* Controller-selected expression */}
+                {/* Expressions remain attached to head */}
                 <g clipPath={`url(#${visorId})`}>
                   <g
                     opacity={faceVisible ? 1 : 0}
@@ -218,10 +228,10 @@ export default function RobotCanvas() {
                     />
                   </g>
                 </g>
-              </g>
+              </RobotGestureRenderer>
             </g>
-          </g>
-        </svg>
+          </svg>
+        </div>
       </div>
 
       {/* Temporary expression testing buttons */}
