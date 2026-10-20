@@ -194,14 +194,8 @@ export default function RobotFace({
   const winkRightEye =
     "M 635 404 Q 690 416 745 404";
 
-  const allowBlink =
-    expression !== "surprised" &&
-    expression !== "thinking" &&
-    expression !== "confused" &&
-    expression !== "loved";
-
-  const eyeScaleY =
-    blinking && allowBlink ? 0.04 : 1;
+  // Every expression now supports natural blinking.
+  const eyeScaleY = blinking ? 0.04 : 1;
 
   const mouthPath =
     expression === "happy"
