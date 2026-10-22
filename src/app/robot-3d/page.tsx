@@ -1,42 +1,37 @@
 
 import Link from "next/link";
-
-import Robot3DCanvas from "@/components/mascot/robot-3d-canvas";
+import RobotTripoTest from "@/components/mascot/robot-tripo-test";
 
 export default function Robot3DTestPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center bg-[#11142B] px-4 py-8 text-[#F7F8FC]">
-      <div className="mb-6 flex w-full max-w-5xl items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#A8A2FF]">
-            KitCart Development
-          </p>
+    <main className="min-h-screen bg-[#11142B] px-5 py-8 text-[#F7F8FC]">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#A8A2FF]">
+              KitCart Development
+            </p>
 
-          <h1 className="mt-2 text-2xl font-bold">
-            3D Robot Studio
-          </h1>
+            <h1 className="mt-2 text-3xl font-bold">
+              Tripo 3D Animation Test
+            </h1>
 
-          <p className="mt-2 text-sm text-white/60">
-            Final Hunyuan GLB — lighting and model test
-          </p>
+            <p className="mt-2 text-sm text-white/60">
+              Original compatible Mixamo rig — idle, walk,
+              and head movement.
+            </p>
+          </div>
+
+          <Link
+            href="/"
+            className="rounded-xl border border-white/20 px-4 py-2 text-sm hover:bg-white/10"
+          >
+            Homepage
+          </Link>
         </div>
 
-        <Link
-          href="/"
-          className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10"
-        >
-          Back to 2.5D
-        </Link>
+        <RobotTripoTest />
       </div>
-
-      <div className="aspect-square w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/10">
-        <Robot3DCanvas />
-      </div>
-
-      <p className="mt-5 max-w-xl text-center text-sm text-white/60">
-        This is an isolated 3D development preview.
-        Your existing KitCart robot remains unchanged.
-      </p>
     </main>
   );
 }
