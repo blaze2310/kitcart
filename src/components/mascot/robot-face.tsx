@@ -7,9 +7,14 @@ export type Expression =
   | "thinking"
   | "confused"
   | "wink"
-  | "loved";
+  | "loved"
+  | "sad"
+  | "sleepy"
+  | "curious"
+  | "eyes-closed"
+  | "focused";
 
-// Loved is triggered by interaction, not the manual tester.
+// Preserve the original homepage tester buttons.
 export const EXPRESSIONS: Expression[] = [
   "normal",
   "happy",
@@ -17,6 +22,22 @@ export const EXPRESSIONS: Expression[] = [
   "thinking",
   "confused",
   "wink",
+];
+
+// Complete inventory for the new visor laboratory.
+export const ALL_VISOR_EXPRESSIONS: Expression[] = [
+  "normal",
+  "happy",
+  "surprised",
+  "thinking",
+  "confused",
+  "wink",
+  "loved",
+  "sad",
+  "sleepy",
+  "curious",
+  "eyes-closed",
+  "focused",
 ];
 
 type FaceProps = {
@@ -44,10 +65,10 @@ function FaceStroke({
         d={d}
         fill="none"
         stroke="#00BFFF"
-        strokeWidth={width + 8}
+        strokeWidth={width + 3}
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.8"
+        opacity="0.25"
         filter={`url(#${glowId})`}
       />
       <path
@@ -80,8 +101,8 @@ function RingEye({
         ry="45"
         fill="none"
         stroke="#00BFFF"
-        strokeWidth="37"
-        opacity="0.8"
+        strokeWidth="32"
+        opacity="0.25"
         filter={`url(#${glowId})`}
       />
       <ellipse
@@ -139,7 +160,6 @@ function BlushMarks({
 }) {
   return (
     <g transform={`translate(${cx} ${cy})`}>
-      {/* glow */}
       <g
         stroke="#FF8BC3"
         strokeWidth="10"
@@ -151,8 +171,6 @@ function BlushMarks({
         <path d="M -4 12 L 4 -12" />
         <path d="M 20 12 L 28 -12" />
       </g>
-
-      {/* crisp lines */}
       <g
         stroke="#FFC1DD"
         strokeWidth="5"
@@ -176,6 +194,7 @@ export default function RobotFace({
   smileX,
   smileY,
 }: FaceProps) {
+  // ORIGINAL APPROVED PATHS — UNCHANGED
   const normalLeftEye =
     "M 368 419 C 368 342, 491 342, 491 419";
 
@@ -194,8 +213,42 @@ export default function RobotFace({
   const winkRightEye =
     "M 635 404 Q 690 416 745 404";
 
-  // Every expression now supports natural blinking.
-  const eyeScaleY = blinking ? 0.04 : 1;
+  // NEW EXPRESSION PATHS
+  const sadLeftEye =
+    "M 368 392 Q 430 449 492 392";
+
+  const sadRightEye =
+    "M 628 392 Q 690 449 752 392";
+
+  const sleepyLeftEye =
+    "M 368 399 Q 430 415 492 399";
+
+  const sleepyRightEye =
+    "M 628 399 Q 690 415 752 399";
+
+  const curiousLeftEye =
+    "M 368 422 C 367 326, 492 326, 492 422";
+
+  const closedLeftEye =
+    "M 368 400 Q 430 434 492 400";
+
+  const closedRightEye =
+    "M 628 400 Q 690 434 752 400";
+
+  const focusedLeftEye =
+    "M 372 394 Q 430 374 488 394";
+
+  const focusedRightEye =
+    "M 632 394 Q 690 374 748 394";
+
+  const intentionallyClosed =
+    expression === "eyes-closed" ||
+    expression === "sleepy";
+
+  // Existing blinking behavior remains unchanged
+  // for all original seven expressions.
+  const eyeScaleY =
+    blinking && !intentionallyClosed ? 0.04 : 1;
 
   const mouthPath =
     expression === "happy"
@@ -208,11 +261,20 @@ export default function RobotFace({
             ? "M 515 475 Q 565 525 610 465"
             : expression === "loved"
               ? "M 525 478 Q 560 510 595 478"
-              : "M 518 475 Q 560 507 603 475";
+              : expression === "sad"
+                ? "M 518 499 Q 560 461 603 499"
+                : expression === "sleepy"
+                  ? "M 535 484 Q 560 490 585 484"
+                  : expression === "curious"
+                    ? "M 532 484 Q 560 501 588 484"
+                    : expression === "eyes-closed"
+                    ? "M 521 474 Q 560 505 599 474"
+                    : expression === "focused"
+                      ? "M 531 485 Q 560 491 589 485"
+                      : "M 518 475 Q 560 507 603 475";
 
   return (
     <>
-      {/* All eyes retain the approved higher position. */}
       <g transform={`translate(${eyeX} ${eyeY - 24})`}>
         <g
           transform={
@@ -238,8 +300,6 @@ export default function RobotFace({
                 color="#8FEFFF"
                 glowId={glowId}
               />
-
-              {/* blush marks under eyes */}
               <BlushMarks
                 cx={355}
                 cy={470}
@@ -254,16 +314,8 @@ export default function RobotFace({
           ) : expression === "surprised" ||
             expression === "thinking" ? (
             <>
-              <RingEye
-                cx={430}
-                cy={394}
-                glowId={glowId}
-              />
-              <RingEye
-                cx={690}
-                cy={394}
-                glowId={glowId}
-              />
+              <RingEye cx={430} cy={394} glowId={glowId} />
+              <RingEye cx={690} cy={394} glowId={glowId} />
             </>
           ) : expression === "confused" ? (
             <>
@@ -271,50 +323,79 @@ export default function RobotFace({
                 d={confusedLeftEye}
                 glowId={glowId}
               />
-              <RingEye
-                cx={690}
-                cy={392}
-                glowId={glowId}
-              />
+              <RingEye cx={690} cy={392} glowId={glowId} />
             </>
           ) : expression === "happy" ? (
             <>
-              <FaceStroke
-                d={happyLeftEye}
-                glowId={glowId}
-              />
-              <FaceStroke
-                d={happyRightEye}
-                glowId={glowId}
-              />
+              <FaceStroke d={happyLeftEye} glowId={glowId} />
+              <FaceStroke d={happyRightEye} glowId={glowId} />
             </>
           ) : expression === "wink" ? (
             <>
+              <FaceStroke d={normalLeftEye} glowId={glowId} />
+              <FaceStroke d={winkRightEye} glowId={glowId} />
+            </>
+          ) : expression === "sad" ? (
+            <>
+              <FaceStroke d={sadLeftEye} glowId={glowId} />
+              <FaceStroke d={sadRightEye} glowId={glowId} />
+            </>
+          ) : expression === "sleepy" ? (
+            <>
               <FaceStroke
-                d={normalLeftEye}
+                d={sleepyLeftEye}
+                width={20}
                 glowId={glowId}
               />
               <FaceStroke
-                d={winkRightEye}
+                d={sleepyRightEye}
+                width={20}
+                glowId={glowId}
+              />
+            </>
+          ) : expression === "curious" ? (
+            <>
+              <FaceStroke
+                d={curiousLeftEye}
+                glowId={glowId}
+              />
+              <RingEye cx={690} cy={394} glowId={glowId} />
+            </>
+          ) : expression === "eyes-closed" ? (
+            <>
+              <FaceStroke
+                d={closedLeftEye}
+                width={22}
+                glowId={glowId}
+              />
+              <FaceStroke
+                d={closedRightEye}
+                width={22}
+                glowId={glowId}
+              />
+            </>
+          ) : expression === "focused" ? (
+            <>
+              <FaceStroke
+                d={focusedLeftEye}
+                width={24}
+                glowId={glowId}
+              />
+              <FaceStroke
+                d={focusedRightEye}
+                width={24}
                 glowId={glowId}
               />
             </>
           ) : (
             <>
-              <FaceStroke
-                d={normalLeftEye}
-                glowId={glowId}
-              />
-              <FaceStroke
-                d={normalRightEye}
-                glowId={glowId}
-              />
+              <FaceStroke d={normalLeftEye} glowId={glowId} />
+              <FaceStroke d={normalRightEye} glowId={glowId} />
             </>
           )}
         </g>
       </g>
 
-      {/* Mouth */}
       <g transform={`translate(${smileX} ${smileY})`}>
         {expression === "surprised" ? (
           <>
@@ -326,7 +407,7 @@ export default function RobotFace({
               fill="none"
               stroke="#00BFFF"
               strokeWidth="20"
-              opacity="0.8"
+              opacity="0.25"
               filter={`url(#${glowId})`}
             />
             <ellipse

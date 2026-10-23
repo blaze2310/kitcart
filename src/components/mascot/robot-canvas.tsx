@@ -168,14 +168,8 @@ export default function RobotCanvas() {
             aria-hidden="true"
           >
             <defs>
-              <filter
-                id={glowId}
-                x="-60%"
-                y="-100%"
-                width="220%"
-                height="300%"
-              >
-                <feGaussianBlur stdDeviation="12" />
+              <filter id={glowId} filterUnits="userSpaceOnUse" x="0" y="0" width="1142" height="1378">
+                <feGaussianBlur stdDeviation="4" />
               </filter>
 
               <clipPath id={visorId}>
