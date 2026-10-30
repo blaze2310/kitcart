@@ -8,16 +8,6 @@ import type {
   Expression,
 } from "@/components/mascot/robot-face";
 
-/**
- * KitCart approved 3D visor face renderer.
- *
- * Extracted from the approved test checkpoint d67d615.
- * Keeps all twelve facial expressions and their colors.
- *
- * Browser only: requires Canvas 2D and Path2D.
- * The caller owns the returned texture and must dispose it.
- */
-
 export type VisorFaceOptions = {
   expression: Expression;
   gap?: number;
@@ -37,29 +27,35 @@ export const VISOR_FACE_SIZE = {
   height: 648,
 } as const;
 
-export function createVisorFaceTexture({
-  expression,
-  gap = expression === "happy" ? 18 : 0,
-  blinking = false,
-}: VisorFaceOptions): CanvasTexture {
-  const canvas = document.createElement("canvas");
-
-  canvas.width = VISOR_FACE_SIZE.width;
-  canvas.height = VISOR_FACE_SIZE.height;
-
+/**
+ * Draw the approved KitCart face on an existing canvas.
+ *
+ * Does not create or dispose a Three.js texture.
+ * Supports all twelve approved expressions.
+ */
+export function drawVisorFace(
+  canvas: HTMLCanvasElement,
+  {
+    expression,
+    gap = expression === "happy" ? 18 : 0,
+    blinking = false,
+  }: VisorFaceOptions
+): void {
   const context = canvas.getContext("2d");
 
   if (!context) {
     throw new Error("Canvas context unavailable");
   }
 
+  // This non-null constant is safe in nested functions.
   const ctx = context;
 
+  ctx.resetTransform();
   ctx.clearRect(
     0,
     0,
-    VISOR_FACE_SIZE.width,
-    VISOR_FACE_SIZE.height
+    canvas.width,
+    canvas.height
   );
 
   ctx.setTransform(2, 0, 0, 2, -610, -468);
@@ -114,9 +110,9 @@ export function createVisorFaceTexture({
   ) {
     const shape = new Path2D(
       "M 0 35 C -9 27 -48 4 -48 -21 " +
-        "C -48 -46 -18 -53 0 -29 " +
-        "C 18 -53 48 -46 48 -21 " +
-        "C 48 4 9 27 0 35 Z"
+      "C -48 -46 -18 -53 0 -29 " +
+      "C 18 -53 48 -46 48 -21 " +
+      "C 48 4 9 27 0 35 Z"
     );
 
     ctx.save();
@@ -242,7 +238,8 @@ export function createVisorFaceTexture({
     sad: "M 518 499 Q 560 461 603 499",
     sleepy: "M 535 484 Q 560 490 585 484",
     curious: "M 532 484 Q 560 501 588 484",
-    "eyes-closed": "M 521 474 Q 560 505 599 474",
+    "eyes-closed":
+      "M 521 474 Q 560 505 599 474",
     focused: "M 531 485 Q 560 491 589 485",
   };
 
@@ -287,11 +284,44 @@ export function createVisorFaceTexture({
   }
 
   ctx.restore();
+}
+
+/**
+ * Create one CanvasTexture per mounted robot.
+ * Its owner must dispose it when the robot unmounts.
+ */
+export function createVisorFaceTexture(
+  options: VisorFaceOptions
+): CanvasTexture {
+  const canvas = document.createElement("canvas");
+
+  canvas.width = VISOR_FACE_SIZE.width;
+  canvas.height = VISOR_FACE_SIZE.height;
+
+  drawVisorFace(canvas, options);
 
   const texture = new CanvasTexture(canvas);
-
   texture.colorSpace = SRGBColorSpace;
   texture.needsUpdate = true;
 
   return texture;
+}
+
+/**
+ * Redraw the existing texture instead of replacing it.
+ */
+export function updateVisorFaceTexture(
+  texture: CanvasTexture,
+  options: VisorFaceOptions
+): void {
+  const canvas = texture.image;
+
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    throw new Error(
+      "KitCart visor texture must use an HTML canvas"
+    );
+  }
+
+  drawVisorFace(canvas, options);
+  texture.needsUpdate = true;
 }

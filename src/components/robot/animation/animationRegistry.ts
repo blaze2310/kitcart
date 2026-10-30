@@ -1,34 +1,14 @@
 
 import type { Expression } from "@/components/mascot/robot-face";
 
-/**
- * KitCart Robot Animation Registry
- *
- * Centralized animation definitions for:
- * - Login robot
- * - Signup robot
- * - Robot development studio
- * - Future interactive Pet Mode
- *
- * This registry does not load models or create mixers.
- * Playback is handled separately.
- */
-
 export const ROBOT_ANIMATION_BASE =
   "/models/kitcart/animations/stay-in-place/";
 
 export const ROBOT_MODEL_URL =
   `${ROBOT_ANIMATION_BASE}idle.glb`;
 
-export type RobotPlaybackMode =
-  | "loop"
-  | "once"
-  | "hold";
-
-export type RobotFeature =
-  | "core"
-  | "login"
-  | "pet";
+export type RobotPlaybackMode = "loop" | "once" | "hold";
+export type RobotFeature = "core" | "login" | "pet";
 
 export type RobotAnimationDefinition = {
   id: string;
@@ -41,17 +21,6 @@ export type RobotAnimationDefinition = {
   mouseTracking: boolean;
 };
 
-/**
- * The approved test page loops every selected
- * animation using its native GLB duration.
- *
- * The production login controller can request
- * "once" or "hold" depending on the interaction.
- *
- * Playback overrides belong to the controller,
- * not to the GLB asset itself.
- */
-
 export const ROBOT_ANIMATIONS = {
   idle: {
     id: "idle",
@@ -63,7 +32,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: true,
   },
-
   looking: {
     id: "looking",
     label: "Looking Around",
@@ -74,7 +42,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   wave: {
     id: "wave",
     label: "Greeting Wave",
@@ -85,7 +52,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   wave2: {
     id: "wave2",
     label: "Greeting Wave 2",
@@ -96,7 +62,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   clapping: {
     id: "clapping",
     label: "Clapping",
@@ -107,7 +72,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   stretch: {
     id: "stretch",
     label: "Stretch",
@@ -118,7 +82,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   peek: {
     id: "peek",
     label: "Password Sneak",
@@ -129,7 +92,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   head: {
     id: "head",
     label: "Sneaky Head",
@@ -140,7 +102,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   lean: {
     id: "lean",
     label: "Side Lean",
@@ -151,7 +112,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   turn: {
     id: "turn",
     label: "Turn",
@@ -162,7 +122,6 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-
   sad: {
     id: "sad",
     label: "Sad Animation",
@@ -173,13 +132,19 @@ export const ROBOT_ANIMATIONS = {
     transitionSeconds: 0.12,
     mouseTracking: false,
   },
-} as const satisfies Record<
-  string,
-  RobotAnimationDefinition
->;
+  shy: {
+    id: "shy",
+    label: "Shy",
+    file: "shy.glb",
+    expression: "loved",
+    playback: "once",
+    features: ["core", "login", "pet"],
+    transitionSeconds: 0.12,
+    mouseTracking: false,
+  },
+} as const satisfies Record<string, RobotAnimationDefinition>;
 
-export type RobotAnimationId =
-  keyof typeof ROBOT_ANIMATIONS;
+export type RobotAnimationId = keyof typeof ROBOT_ANIMATIONS;
 
 export const ROBOT_ANIMATION_IDS =
   Object.keys(ROBOT_ANIMATIONS) as RobotAnimationId[];
@@ -193,8 +158,7 @@ export function getRobotAnimation(
 export function getRobotAnimationUrl(
   id: RobotAnimationId
 ): string {
-  return ROBOT_ANIMATION_BASE +
-    ROBOT_ANIMATIONS[id].file;
+  return ROBOT_ANIMATION_BASE + ROBOT_ANIMATIONS[id].file;
 }
 
 export function getRobotAnimationsForFeature(
@@ -203,32 +167,19 @@ export function getRobotAnimationsForFeature(
   return ROBOT_ANIMATION_IDS
     .map((id) => ROBOT_ANIMATIONS[id])
     .filter((animation) =>
-      animation.features.some(
-        (item) => item === feature
-      )
+      animation.features.some((item) => item === feature)
     );
 }
 
-/**
- * Returns deduplicated URLs for preloading.
- *
- * Preload the animations needed for the current
- * feature, rather than every future pet animation
- * when the login page opens.
- */
 export function getRobotPreloadUrls(
   feature: RobotFeature
 ): string[] {
-  const animations =
-    getRobotAnimationsForFeature(feature);
-
   return [
     ...new Set([
       ROBOT_MODEL_URL,
-      ...animations.map(
+      ...getRobotAnimationsForFeature(feature).map(
         (animation) =>
-          ROBOT_ANIMATION_BASE +
-          animation.file
+          ROBOT_ANIMATION_BASE + animation.file
       ),
     ]),
   ];

@@ -15,22 +15,19 @@ import { useGLTF } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 
 import {
-  AnimationAction,
   AnimationClip,
-  AnimationMixer,
   Bone,
   Box3,
   DoubleSide,
-  LoopRepeat,
-  MathUtils,
   MeshBasicMaterial,
   Object3D,
-  Quaternion,
   SkinnedMesh,
   Vector3,
 } from "three";
 
-import type { Expression } from "@/components/mascot/robot-face";
+import type {
+  Expression,
+} from "@/components/mascot/robot-face";
 
 import {
   getRobotAnimation,
@@ -40,7 +37,22 @@ import {
 } from "./animation/animationRegistry";
 
 import {
+  useRobotAnimation,
+  type RobotActionRequest,
+  type RobotActionEvent,
+} from "./animation/useRobotAnimation";
+
+import {
+  useRobotHeadTracking,
+} from "./hooks/useRobotHeadTracking";
+
+import {
+  useRobotAutoBlink,
+} from "./hooks/useRobotAutoBlink";
+
+import {
   createVisorFaceTexture,
+  updateVisorFaceTexture,
 } from "./visor/faceRenderer";
 
 import {
@@ -51,30 +63,7 @@ import {
   type VisorMaskData,
 } from "./visor/visorGeometry";
 
-// ============================================================
-// KITCART MODULAR 3D ROBOT
-//
-// Approved reference: Git checkpoint d67d615
-//
-// This component is responsible for:
-// - Loading the compatible rig
-// - Attaching the approved V4 visor
-// - Playing GLB animations
-// - Displaying 12 approved facial expressions
-// - Idle mouse tracking
-// - Five-second mouse inactivity timeout
-//
-// The test page controls manual blinking and expressions.
-// Production login behavior will be implemented separately.
-//
-// TypeScript fix:
-// findBodyMesh() returns a correctly typed SkinnedMesh.
-// ============================================================
-
-export type RobotActionRequest = {
-  id: RobotAnimationId;
-  serial: number;
-};
+export type { RobotActionRequest };
 
 export type RobotDiagnostics = {
   id: RobotAnimationId;
@@ -88,8 +77,8 @@ export type RobotDiagnostics = {
 export type Robot3DProps = {
   request: RobotActionRequest;
   expression: Expression;
-
   blinking?: boolean;
+  autoBlink?: boolean;
   playing?: boolean;
   speed?: number;
   tracking?: boolean;
@@ -100,30 +89,15 @@ export type Robot3DProps = {
     face: Expression
   ) => void;
 
+  onActionCompleted?: (
+    id: RobotAnimationId
+  ) => void;
+
   onDiagnostics?: (
-    status: RobotDiagnostics
+    data: RobotDiagnostics
   ) => void;
 };
 
-const INACTIVITY_MS = 5000;
-const POINTER_THRESHOLD_PX = 2;
-const TRACKING_SMOOTHNESS = 7;
-
-const Y_AXIS = new Vector3(0, 1, 0);
-const Z_AXIS = new Vector3(0, 0, 1);
-
-// ============================================================
-// RIG HELPERS
-// ============================================================
-
-/**
- * Find the approved body mesh.
- *
- * IMPORTANT:
- * Collecting meshes in an array avoids TypeScript's
- * incorrect narrowing when assigning a variable
- * inside Object3D.traverse().
- */
 function findBodyMesh(
   model: Object3D
 ): SkinnedMesh | null {
@@ -132,7 +106,8 @@ function findBodyMesh(
   model.traverse((object) => {
     if (
       object instanceof SkinnedMesh &&
-      object.geometry.getAttribute("position")?.count ===
+      object.geometry.getAttribute("position")
+        ?.count ===
         VISOR_GEOMETRY_CONFIG.modelVertices
     ) {
       matches.push(object);
@@ -142,33 +117,24 @@ function findBodyMesh(
   return matches[0] ?? null;
 }
 
-/**
- * Find the head bone on the compatible animated rig.
- */
 function findHeadBone(
   mesh: SkinnedMesh | null
 ): Bone | null {
-  if (!mesh) {
-    return null;
-  }
+  if (!mesh) return null;
 
   return (
     mesh.skeleton.bones.find((bone) => {
-      const normalized = bone.name
+      const name = bone.name
         .replace(/[^a-z0-9]/gi, "")
         .toLowerCase();
 
       return (
-        normalized === "mixamorighead" ||
-        normalized === "head"
+        name === "mixamorighead" ||
+        name === "head"
       );
     }) ?? null
   );
 }
-
-// ============================================================
-// ANIMATION CLIP LOADER
-// ============================================================
 
 function AnimationClipLoader({
   url,
@@ -177,7 +143,7 @@ function AnimationClipLoader({
   url: string;
   onLoaded: (
     clip: AnimationClip,
-    loadedUrl: string
+    url: string
   ) => void;
 }) {
   const gltf = useGLTF(url);
@@ -193,27 +159,25 @@ function AnimationClipLoader({
   return null;
 }
 
-// ============================================================
-// ROBOT RIG
-// ============================================================
-
 function RobotRig({
   mask,
   request,
   expression,
   blinking = false,
+  autoBlink = false,
   playing = true,
   speed = 1,
   tracking = true,
   showFace = true,
   onActionStarted,
+  onActionCompleted,
   onDiagnostics,
 }: Robot3DProps & {
   mask: VisorMaskData;
 }) {
-  // ----------------------------------------------------------
-  // LOAD AND CLONE COMPATIBLE RIG
-  // ----------------------------------------------------------
+  // --------------------------------------------------
+  // COMPATIBLE ANIMATED RIG
+  // --------------------------------------------------
 
   const gltf = useGLTF(ROBOT_MODEL_URL);
 
@@ -222,48 +186,33 @@ function RobotRig({
     [gltf.scene]
   );
 
-  const source = useMemo<SkinnedMesh | null>(
+  const source = useMemo(
     () => findBodyMesh(model),
     [model]
   );
 
-  const head = useMemo<Bone | null>(
+  const head = useMemo(
     () => findHeadBone(source),
     [source]
   );
 
-  const mixer = useMemo(
-    () => new AnimationMixer(model),
-    [model]
-  );
-
-  const activeAction =
-    useRef<AnimationAction | null>(null);
+  const selectedUrl =
+    getRobotAnimationUrl(request.id);
 
   const overlayRef =
     useRef<SkinnedMesh | null>(null);
 
-  const definition =
-    getRobotAnimation(request.id);
-
-  const selectedUrl =
-    getRobotAnimationUrl(request.id);
-
-  // ----------------------------------------------------------
-  // MODEL FRAMING
-  // ----------------------------------------------------------
-
   const framing = useMemo(() => {
     model.updateMatrixWorld(true);
 
-    const box =
+    const bounds =
       new Box3().setFromObject(model);
 
     const size =
-      box.getSize(new Vector3());
+      bounds.getSize(new Vector3());
 
     const center =
-      box.getCenter(new Vector3());
+      bounds.getCenter(new Vector3());
 
     return {
       scale:
@@ -274,7 +223,6 @@ function RobotRig({
           size.z,
           0.001
         ),
-
       position: [
         -center.x,
         -center.y,
@@ -283,53 +231,83 @@ function RobotRig({
     };
   }, [model]);
 
-  // ----------------------------------------------------------
-  // APPROVED VISOR FACE TEXTURE
+  // --------------------------------------------------
+  // REUSABLE BLINK CONTROLLER
   //
-  // Expression and blinking changes do not
-  // restart or reload the body animation.
-  // ----------------------------------------------------------
+  // The development page supplies its own blinking
+  // state, so autoBlink remains disabled there.
+  //
+  // Future login and pet integrations can enable
+  // built-in blinking without duplicating timers.
+  // --------------------------------------------------
+
+  const {
+    blinking: automaticBlinking,
+  } = useRobotAutoBlink({
+    enabled: autoBlink,
+  });
+
+  const effectiveBlinking =
+    blinking || automaticBlinking;
+
+  // --------------------------------------------------
+  // ONE PERSISTENT VISOR CANVAS TEXTURE
+  // --------------------------------------------------
 
   const texture = useMemo(
     () =>
       createVisorFaceTexture({
         expression,
-        blinking,
+        blinking: effectiveBlinking,
       }),
-    [expression, blinking]
+    // Create once for this mounted robot instance.
+    // Subsequent changes redraw the same canvas.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
-  // ----------------------------------------------------------
-  // APPROVED 444-TRIANGLE VISOR GEOMETRY
-  // ----------------------------------------------------------
+  useEffect(() => {
+    updateVisorFaceTexture(texture, {
+      expression,
+      blinking: effectiveBlinking,
+    });
+  }, [
+    texture,
+    expression,
+    effectiveBlinking,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      texture.dispose();
+    };
+  }, [texture]);
+
+  // --------------------------------------------------
+  // APPROVED SKINNED VISOR GEOMETRY
+  // --------------------------------------------------
 
   const geometry = useMemo(
     () =>
       source
         ? createVisorGeometry({
             source,
-            selectedFaces:
-              mask.selectedFaces,
+            selectedFaces: mask.selectedFaces,
           })
         : null,
     [source, mask]
   );
 
   const overlay = useMemo(() => {
-    if (!source || !geometry) {
-      return null;
-    }
+    if (!source || !geometry) return null;
 
     const material =
       new MeshBasicMaterial({
         transparent: true,
         alphaTest: 0.02,
-
         side: DoubleSide,
-
         depthTest: true,
         depthWrite: false,
-
         polygonOffset: true,
         polygonOffsetFactor: -3,
         polygonOffsetUnits: -3,
@@ -342,31 +320,21 @@ function RobotRig({
     );
   }, [source, geometry]);
 
-  // ----------------------------------------------------------
-  // ATTACH VISOR TO THE ORIGINAL SKELETON
-  // ----------------------------------------------------------
-
   useEffect(() => {
     overlayRef.current = overlay;
 
-    if (!source || !overlay) {
-      return;
-    }
+    if (!source || !overlay) return;
 
     const parent = source.parent;
 
-    if (!parent) {
-      return;
-    }
+    if (!parent) return;
 
     parent.add(overlay);
 
     return () => {
       parent.remove(overlay);
 
-      if (
-        overlayRef.current === overlay
-      ) {
+      if (overlayRef.current === overlay) {
         overlayRef.current = null;
       }
 
@@ -381,19 +349,14 @@ function RobotRig({
     };
   }, [source, overlay]);
 
-  // Update only the visor texture when the
-  // expression or blinking state changes.
   useEffect(() => {
     if (
       overlay &&
       overlay.material instanceof
         MeshBasicMaterial
     ) {
-      overlay.material.map =
-        texture;
-
-      overlay.material.needsUpdate =
-        true;
+      overlay.material.map = texture;
+      overlay.material.needsUpdate = true;
     }
   }, [overlay, texture]);
 
@@ -403,193 +366,28 @@ function RobotRig({
     }
   }, [overlay, showFace]);
 
-  useEffect(() => {
-    return () => {
-      texture.dispose();
-    };
-  }, [texture]);
+  // --------------------------------------------------
+  // ANIMATION START AND COMPLETION EVENTS
+  // --------------------------------------------------
 
-  // ----------------------------------------------------------
-  // CURSOR TRACKING
-  //
-  // Tracking works only when the active
-  // animation permits mouse following.
-  //
-  // After five seconds without movement,
-  // the robot returns smoothly to neutral.
-  // ----------------------------------------------------------
+  const handleStarted = useCallback(
+    (event: RobotActionEvent) => {
+      const action =
+        getRobotAnimation(event.id);
 
-  const pointer = useRef({
-    x: 0,
-    y: 0,
-  });
-
-  const gaze = useRef({
-    x: 0,
-    y: 0,
-  });
-
-  const lastPointerPosition = useRef<{
-    x: number;
-    y: number;
-  } | null>(null);
-
-  const lastMovementTime = useRef(0);
-
-  const yaw = useMemo(
-    () => new Quaternion(),
-    []
-  );
-
-  const pitch = useMemo(
-    () => new Quaternion(),
-    []
-  );
-
-  const correction = useMemo(
-    () => new Quaternion(),
-    []
-  );
-
-  const previousCorrection = useMemo(
-    () => new Quaternion(),
-    []
-  );
-
-  const inverseCorrection = useMemo(
-    () => new Quaternion(),
-    []
-  );
-
-  useEffect(() => {
-    const handlePointerMove = (
-      event: PointerEvent
-    ) => {
-      const previous =
-        lastPointerPosition.current;
-
-      if (
-        previous &&
-        Math.hypot(
-          event.clientX - previous.x,
-          event.clientY - previous.y
-        ) < POINTER_THRESHOLD_PX
-      ) {
-        return;
-      }
-
-      lastPointerPosition.current = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-
-      pointer.current.x =
-        MathUtils.clamp(
-          (event.clientX /
-            window.innerWidth) *
-            2 -
-            1,
-          -1,
-          1
-        );
-
-      pointer.current.y =
-        MathUtils.clamp(
-          1 -
-            (event.clientY /
-              window.innerHeight) *
-              2,
-          -1,
-          1
-        );
-
-      lastMovementTime.current =
-        performance.now();
-    };
-
-    window.addEventListener(
-      "pointermove",
-      handlePointerMove,
-      { passive: true }
-    );
-
-    return () => {
-      window.removeEventListener(
-        "pointermove",
-        handlePointerMove
-      );
-    };
-  }, []);
-
-  // ----------------------------------------------------------
-  // ANIMATION PLAYBACK
-  //
-  // Uses actual GLB clip durations.
-  // Facial updates never reset the animation.
-  // ----------------------------------------------------------
-
-  const activateClip = useCallback(
-    (
-      clip: AnimationClip,
-      loadedUrl: string
-    ) => {
-      if (loadedUrl !== selectedUrl) {
-        return;
-      }
-
-      const previous =
-        activeAction.current;
-
-      const next =
-        mixer.clipAction(clip);
-
-      next.reset();
-      next.enabled = true;
-
-      next.setEffectiveWeight(1);
-      next.setEffectiveTimeScale(1);
-
-      // The modular test preserves the
-      // approved full-duration looping.
-      next.setLoop(
-        LoopRepeat,
-        Infinity
-      );
-
-      next.clampWhenFinished =
-        false;
-
-      next.play();
-
-      if (
-        previous &&
-        previous !== next
-      ) {
-        next.crossFadeFrom(
-          previous,
-          definition.transitionSeconds,
-          false
-        );
-      }
-
-      activeAction.current = next;
-
-      // Synchronize face with the body action.
       onActionStarted?.(
-        request.id,
-        definition.expression
+        event.id,
+        action.expression
       );
 
-      const visor =
-        overlayRef.current;
+      const visor = overlayRef.current;
 
       onDiagnostics?.({
-        id: request.id,
-        label: definition.label,
-        duration: clip.duration,
-        tracks: clip.tracks.length,
+        id: event.id,
+        label: action.label,
+        duration: event.clip.duration,
+        tracks: event.clip.tracks.length,
         headFound: head !== null,
-
         sharedSkeleton:
           visor !== null &&
           source !== null &&
@@ -598,11 +396,6 @@ function RobotRig({
       });
     },
     [
-      mixer,
-      selectedUrl,
-      request.id,
-      request.serial,
-      definition,
       head,
       source,
       onActionStarted,
@@ -610,115 +403,61 @@ function RobotRig({
     ]
   );
 
-  useEffect(() => {
-    return () => {
-      mixer.stopAllAction();
-    };
-  }, [mixer]);
+  const handleCompleted = useCallback(
+    (event: RobotActionEvent) => {
+      onActionCompleted?.(event.id);
+    },
+    [onActionCompleted]
+  );
 
-  // ----------------------------------------------------------
-  // RENDER LOOP
-  //
-  // 1. Undo previous cursor correction.
-  // 2. Advance current GLB animation.
-  // 3. Calculate cursor activity.
-  // 4. Smoothly update head orientation.
-  // ----------------------------------------------------------
-
-  useFrame((_, delta) => {
-    const dt =
-      Math.min(delta, 0.05);
-
-    if (head) {
-      inverseCorrection
-        .copy(previousCorrection)
-        .invert();
-
-      head.quaternion.multiply(
-        inverseCorrection
-      );
-    }
-
-    mixer.update(
-      playing ? dt * speed : 0
-    );
-
-    const movementIsRecent =
-      lastMovementTime.current > 0 &&
-      performance.now() -
-        lastMovementTime.current <
-        INACTIVITY_MS;
-
-    const shouldFollow =
-      tracking &&
-      definition.mouseTracking &&
-      movementIsRecent;
-
-    const alpha =
-      1 -
-      Math.exp(
-        -TRACKING_SMOOTHNESS * dt
-      );
-
-    gaze.current.x =
-      MathUtils.lerp(
-        gaze.current.x,
-        shouldFollow
-          ? pointer.current.x
-          : 0,
-        alpha
-      );
-
-    gaze.current.y =
-      MathUtils.lerp(
-        gaze.current.y,
-        shouldFollow
-          ? pointer.current.y
-          : 0,
-        alpha
-      );
-
-    if (!head) {
-      return;
-    }
-
-    yaw.setFromAxisAngle(
-      Y_AXIS,
-      MathUtils.degToRad(
-        30 * gaze.current.x
-      )
-    );
-
-    pitch.setFromAxisAngle(
-      Z_AXIS,
-      MathUtils.degToRad(
-        18 * gaze.current.y
-      )
-    );
-
-    correction
-      .copy(yaw)
-      .multiply(pitch);
-
-    head.quaternion.multiply(
-      correction
-    );
-
-    previousCorrection.copy(
-      correction
-    );
+  const {
+    activateClip,
+    update,
+    activeIdRef,
+  } = useRobotAnimation({
+    model,
+    request,
+    idleClip: gltf.animations[0],
+    playing,
+    speed,
+    onStarted: handleStarted,
+    onCompleted: handleCompleted,
   });
 
-  // ----------------------------------------------------------
-  // DISPLAY COMPATIBLE RIG
-  // ----------------------------------------------------------
+  // --------------------------------------------------
+  // APPROVED HEAD TRACKING
+  // --------------------------------------------------
+
+  const {
+    beforeAnimationUpdate,
+    afterAnimationUpdate,
+  } = useRobotHeadTracking({
+    head,
+    enabled: tracking,
+  });
+
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.05);
+
+    beforeAnimationUpdate();
+    update(dt);
+
+    const activeDefinition =
+      getRobotAnimation(
+        activeIdRef.current
+      );
+
+    afterAnimationUpdate(
+      dt,
+      tracking &&
+        activeDefinition.mouseTracking
+    );
+  });
 
   return (
     <>
       <group scale={framing.scale}>
-        <group
-          position={framing.position}
-        >
+        <group position={framing.position}>
           <primitive object={model} />
         </group>
       </group>
@@ -734,26 +473,14 @@ function RobotRig({
   );
 }
 
-// ============================================================
-// PUBLIC REUSABLE ROBOT COMPONENT
-// ============================================================
-
 export default function Robot3D(
   props: Robot3DProps
 ) {
-  const [
-    mask,
-    setMask,
-  ] = useState<VisorMaskData | null>(
-    null
-  );
+  const [mask, setMask] =
+    useState<VisorMaskData | null>(null);
 
-  const [
-    maskError,
-    setMaskError,
-  ] = useState<string | null>(
-    null
-  );
+  const [maskError, setMaskError] =
+    useState<string | null>(null);
 
   useEffect(() => {
     const controller =
@@ -763,10 +490,7 @@ export default function Robot3D(
       try {
         const response = await fetch(
           VISOR_GEOMETRY_CONFIG.maskUrl,
-          {
-            signal:
-              controller.signal,
-          }
+          { signal: controller.signal }
         );
 
         if (!response.ok) {
@@ -778,9 +502,7 @@ export default function Robot3D(
         const data: unknown =
           await response.json();
 
-        if (
-          !validateVisorMask(data)
-        ) {
+        if (!validateVisorMask(data)) {
           throw new Error(
             "Invalid approved V4 visor mask"
           );
@@ -789,11 +511,7 @@ export default function Robot3D(
         setMask(data);
         setMaskError(null);
       } catch (error) {
-        if (
-          controller.signal.aborted
-        ) {
-          return;
-        }
+        if (controller.signal.aborted) return;
 
         setMaskError(
           error instanceof Error
@@ -805,9 +523,7 @@ export default function Robot3D(
 
     void loadMask();
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, []);
 
   if (maskError) {
@@ -815,25 +531,16 @@ export default function Robot3D(
       "[KitCart Robot3D]",
       maskError
     );
-
     return null;
   }
 
-  if (!mask) {
-    return null;
-  }
+  if (!mask) return null;
 
   return (
     <Suspense fallback={null}>
-      <RobotRig
-        {...props}
-        mask={mask}
-      />
+      <RobotRig {...props} mask={mask} />
     </Suspense>
   );
 }
 
-// Only preload the base rig here.
-// Feature-specific clips are preloaded
-// separately by the relevant page.
 useGLTF.preload(ROBOT_MODEL_URL);
