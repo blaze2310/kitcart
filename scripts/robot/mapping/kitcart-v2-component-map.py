@@ -3,7 +3,7 @@ import trimesh
 import plotly.graph_objects as go
 
 MODEL = "public/models/kitcart/kitcart-final.glb"
-OUTPUT = "scripts/kitcart-v2-components.html"
+OUTPUT = "scripts/robot/previews/kitcart-v2-components.html"
 
 mesh = trimesh.load(MODEL, force="scene").to_geometry()
 

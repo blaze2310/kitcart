@@ -4,7 +4,7 @@ import trimesh
 import plotly.graph_objects as go
 
 MODEL = "public/models/kitcart/kitcart-rig-test.glb"
-OUTPUT = "scripts/kitcart-v2-body-components.html"
+OUTPUT = "scripts/robot/previews/kitcart-v2-body-components.html"
 
 SHOW_COMPONENTS = 40
 REFERENCE_POINTS = 18000

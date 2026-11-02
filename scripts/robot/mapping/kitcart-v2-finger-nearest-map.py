@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from scipy.spatial import cKDTree
 
 MODEL = "public/models/kitcart/kitcart-rig-test.glb"
-OUTPUT = "scripts/kitcart-v2-finger-nearest-map.html"
+OUTPUT = "scripts/robot/previews/kitcart-v2-finger-nearest-map.html"
 
 SHIFT_X = -0.12
 TOP_N = 30

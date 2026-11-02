@@ -4,7 +4,7 @@ import trimesh
 import plotly.graph_objects as go
 
 MODEL = "public/models/kitcart/kitcart-rig-test.glb"
-OUTPUT = "scripts/kitcart-v2-arm-map.html"
+OUTPUT = "scripts/robot/previews/kitcart-v2-arm-map.html"
 
 scene = trimesh.load(MODEL, force="scene")
 body = scene.geometry["KitCart_Body"]

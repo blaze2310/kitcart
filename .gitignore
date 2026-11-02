@@ -58,3 +58,7 @@ dist/
 *.log
 
 /archive/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
