@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
+import CleanOAuthHash from "@/features/auth/components/CleanOAuthHash";
 
 async function AccountContent() {
   const session = await auth();
@@ -12,13 +13,14 @@ async function AccountContent() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-12">
+      <CleanOAuthHash />
       <section className="kc-glass rounded-3xl p-8 w-full max-w-md text-center">
         <h1 className="text-3xl font-bold mb-3">
           Welcome to KitCart!
         </h1>
 
         <p className="mb-2">
-          Google authentication was successful.
+          You have successfully signed in to KitCart.
         </p>
 
         <p className="mb-6 text-sm opacity-75">
