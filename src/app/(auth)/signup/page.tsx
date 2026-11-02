@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Info, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { useAuthRobot } from "@/features/auth/components/AuthShell";
 import CodeSlots from "@/features/auth/components/CodeSlots";
-import "@/styles/signup-modal.css";
+import "@/features/auth/styles/signup-modal.css";
 
 type Channel = "email" | "phone";
 const passwordValid = (s: string) => /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,15}$/.test(s);
