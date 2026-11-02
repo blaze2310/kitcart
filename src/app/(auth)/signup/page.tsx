@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Info, Mail, Phone, ShieldCheck, X } from "lucide-react";
-import { useAuthRobot } from "@/components/auth/AuthShell";
-import CodeSlots from "@/components/auth/CodeSlots";
+import { useAuthRobot } from "@/features/auth/components/AuthShell";
+import CodeSlots from "@/features/auth/components/CodeSlots";
 import "@/styles/signup-modal.css";
 
 type Channel = "email" | "phone";

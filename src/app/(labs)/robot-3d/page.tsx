@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import RobotTripoTest from "@/components/mascot/robot-tripo-test";
+import RobotTripoTest from "@/features/robot/2d/robot-tripo-test";
 
 export default function Robot3DTestPage() {
   return (

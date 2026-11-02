@@ -17,16 +17,16 @@ import { OrbitControls } from "@react-three/drei";
 
 import type {
   Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 import Robot3D, {
   type RobotActionRequest,
-} from "@/components/robot/Robot3D";
+} from "@/features/robot/3d/Robot3D";
 
 import {
   getRobotAnimation,
   type RobotAnimationId,
-} from "@/components/robot/animation/animationRegistry";
+} from "@/features/robot/3d/animation/animationRegistry";
 
 const ACTIONS: RobotAnimationId[] = [
   "idle",

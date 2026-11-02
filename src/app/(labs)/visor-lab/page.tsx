@@ -6,7 +6,7 @@ import Link from "next/link";
 import RobotFace, {
   ALL_VISOR_EXPRESSIONS,
   type Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 const ORIGINAL = new Set<Expression>([
   "normal",

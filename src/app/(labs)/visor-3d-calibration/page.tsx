@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import RobotVisorCalibration from "@/components/mascot/robot-visor-calibration";
+import RobotVisorCalibration from "@/features/robot/2d/robot-visor-calibration";
 
 export default function Visor3DCalibrationPage() {
   return (

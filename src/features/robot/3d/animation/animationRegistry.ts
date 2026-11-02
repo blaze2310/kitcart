@@ -1,5 +1,5 @@
 
-import type { Expression } from "@/components/mascot/robot-face";
+import type { Expression } from "@/features/robot/2d/robot-face";
 
 export const ROBOT_ANIMATION_BASE =
   "/models/kitcart/animations/stay-in-place/";

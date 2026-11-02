@@ -5,7 +5,7 @@ import { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
-import RobotInteractive3D from "@/components/robot/RobotInteractive3D";
+import RobotInteractive3D from "@/features/robot/3d/RobotInteractive3D";
 
 export default function RobotInteractionTestPage() {
   const [lastReaction, setLastReaction] =

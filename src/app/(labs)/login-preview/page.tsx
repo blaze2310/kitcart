@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
-import RobotLoginPreview from "@/components/mascot/robot-login-preview";
+import RobotLoginPreview from "@/features/robot/2d/robot-login-preview";
 
 export default function LoginPreviewPage() {
   const [username, setUsername] = useState("");

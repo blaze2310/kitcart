@@ -10,7 +10,7 @@ import {
 import { useGLTF } from "@react-three/drei";
 import type { ThreeEvent } from "@react-three/fiber";
 
-import type { Expression } from "@/components/mascot/robot-face";
+import type { Expression } from "@/features/robot/2d/robot-face";
 import Robot3D, {
   type RobotActionRequest,
 } from "./Robot3D";

@@ -11,7 +11,7 @@ import {
   LockKeyhole,
   Sparkles,
 } from "lucide-react";
-import { useAuthRobot } from "@/components/auth/AuthShell";
+import { useAuthRobot } from "@/features/auth/components/AuthShell";
 
 const providers = ["Google", "Facebook", "GitHub"] as const;
 type Provider = (typeof providers)[number];

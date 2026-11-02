@@ -6,7 +6,7 @@ import {
 
 import type {
   Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 export type VisorFaceOptions = {
   expression: Expression;

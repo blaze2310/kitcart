@@ -35,7 +35,7 @@ import {
 import {
   ALL_VISOR_EXPRESSIONS,
   type Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 // KitCart — synchronized action / expression test.
 // This file does not change the existing login page.

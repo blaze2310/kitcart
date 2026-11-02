@@ -15,7 +15,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import Robot3D, {
   type RobotActionRequest,
   type RobotDiagnostics,
-} from "@/components/robot/Robot3D";
+} from "@/features/robot/3d/Robot3D";
 
 import {
   getRobotAnimation,
@@ -23,11 +23,11 @@ import {
   ROBOT_MODEL_URL,
   type RobotAnimationId,
   type RobotPlaybackMode,
-} from "@/components/robot/animation/animationRegistry";
+} from "@/features/robot/3d/animation/animationRegistry";
 
 import type {
   Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 const TEST_ACTIONS: RobotAnimationId[] = [
   "idle",

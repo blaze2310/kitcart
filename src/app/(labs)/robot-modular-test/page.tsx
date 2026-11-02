@@ -14,19 +14,19 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import {
   ALL_VISOR_EXPRESSIONS,
   type Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 import Robot3D, {
   type RobotActionRequest,
   type RobotDiagnostics,
-} from "@/components/robot/Robot3D";
+} from "@/features/robot/3d/Robot3D";
 
 import {
   getRobotAnimation,
   getRobotPreloadUrls,
   ROBOT_ANIMATION_IDS,
   type RobotAnimationId,
-} from "@/components/robot/animation/animationRegistry";
+} from "@/features/robot/3d/animation/animationRegistry";
 
 export default function RobotModularTestPage() {
   const [request, setRequest] =

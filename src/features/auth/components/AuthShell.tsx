@@ -7,7 +7,7 @@ import { Canvas } from "@react-three/fiber";
 import { ShoppingBag } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-const Robot = dynamic(() => import("@/components/robot/RobotLogin3D"), { ssr: false });
+const Robot = dynamic(() => import("@/features/robot/3d/RobotLogin3D"), { ssr: false });
 type Controls = {
   setUsernameFocused: (value: boolean) => void;
   setPasswordVisible: (value: boolean) => void;

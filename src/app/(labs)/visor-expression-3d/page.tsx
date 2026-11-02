@@ -28,7 +28,7 @@ import {
 import {
   ALL_VISOR_EXPRESSIONS,
   type Expression,
-} from "@/components/mascot/robot-face";
+} from "@/features/robot/2d/robot-face";
 
 const MODEL_URL =
   "/models/kitcart/animations/stay-in-place/idle.glb";
