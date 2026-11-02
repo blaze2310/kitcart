@@ -59,7 +59,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [notice, setNotice] = useState(
-    "Google sign-in is available. Username/password sign-in is coming later."
+    "Google and GitHub sign-in are available. Username/password sign-in is coming later."
   );
   const [connecting, setConnecting] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -76,17 +76,17 @@ export default function LoginPage() {
     passwordRef.current?.focus();
   };
 
-  const connectGoogle = async () => {
+  const connectProvider = async (provider: "google" | "github") => {
     if (connecting) return;
 
     setConnecting(true);
-    setNotice("Connecting securely to Google...");
+    setNotice(`Connecting securely to ${provider === "google" ? "Google" : "GitHub"}...`);
 
     try {
-      await signIn("google", { redirectTo: "/account" });
+      await signIn(provider, { redirectTo: "/account" });
     } catch {
       setConnecting(false);
-      setNotice("Could not start Google sign-in. Please try again.");
+      setNotice(`Could not start ${provider === "google" ? "Google" : "GitHub"} sign-in. Please try again.`);
     }
   };
 
@@ -112,15 +112,15 @@ export default function LoginPage() {
             key={name}
             type="button"
             className="kc-social"
-            disabled={name !== "Google" || connecting}
+            disabled={name === "Facebook" || connecting}
             title={
-              name === "Google"
-                ? "Continue securely with Google"
-                : `${name} sign-in is coming soon`
+              name === "Facebook"
+                ? "Facebook sign-in is coming soon"
+                : `Continue securely with ${name}`
             }
             aria-label={`Sign in with ${name}`}
             onClick={
-              name === "Google" ? connectGoogle : undefined
+              name === "Facebook" ? undefined : () => connectProvider(name === "Google" ? "google" : "github")
             }
           >
             <ProviderIcon name={name} />
