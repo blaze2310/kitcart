@@ -221,3 +221,40 @@
     transform: none;
   }
 }
+
+/* KITCART SOCIAL BUTTON REFINEMENT START */
+
+/* Stronger social-button labels */
+.kc-social {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Larger, sharper logos */
+.kc-social svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  filter: none !important;
+}
+
+.kc-social span {
+  font-weight: 700;
+}
+
+/* Hover: glow around the button border only */
+.kc-social:not(:disabled):hover {
+  background: rgba(226, 235, 255, 0.1);
+  border-color: #8fe2e8;
+  filter: none;
+  box-shadow:
+    0 0 0 1px rgba(143, 226, 232, 0.6),
+    0 0 8px rgba(143, 226, 232, 0.24);
+}
+
+/* Never glow the logo */
+.kc-social:not(:disabled):hover svg {
+  filter: none !important;
+}
+
+/* KITCART SOCIAL BUTTON REFINEMENT END */
