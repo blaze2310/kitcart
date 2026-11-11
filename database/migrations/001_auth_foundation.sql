@@ -31,7 +31,9 @@ ON users (LOWER(email));
 
 CREATE TABLE user_profiles (
     user_id UUID PRIMARY KEY
-        REFERENCES users(id) ON DELETE CAS        REFERENCES users(AR(        REFERENCES users(idAR(16),
+        REFERENCES users(id) ON DELETE CASCADE,
+    username VARCHAR(50),
+    phone_number VARCHAR(16),
     phone_verified_at TIMESTAMPTZ,
     date_of_birth DATE,
     gender VARCHAR(50),
