@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^5.9.2",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
+    "argon2": "^0.45.2",
     "lucide-react": "^1.59.0",
     "motion": "^14.3.0",
     "next": "16.4.2",
