@@ -1,0 +1,172 @@
+.scene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  color: #faf8f3;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.studio {
+  background: #100f17;
+}
+
+.ocean {
+  background:
+    linear-gradient(
+      140deg,
+      #0e4057 0%,
+      #0b3046 52%,
+      #071b2d 100%
+    );
+}
+
+.effects {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.auroraSurface,
+.pillarSurface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.auroraSurface {
+  z-index: 1;
+}
+
+.pillarSurface {
+  z-index: 2;
+}
+
+/*
+ * Let the actual React Bits components
+ * control their own shader appearance.
+ *
+ * No additional opacity.
+ * No artificial masks.
+ * No canvas rotation.
+ * No CSS blur.
+ */
+
+.auroraSurface > div,
+.pillarSurface > div {
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  position: absolute;
+  z-index: 10;
+  left: 28px;
+  bottom: 28px;
+
+  width: min(380px, calc(100% - 40px));
+  padding: 22px;
+
+  border: 1px solid rgba(255, 240, 217, 0.25);
+  border-radius: 20px;
+
+  background: rgba(12, 28, 42, 0.86);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.12);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.eyebrow {
+  color: #8fe2e8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.panel h1 {
+  margin: 10px 0;
+  color: #fff0d9;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.panel p {
+  margin: 0 0 18px;
+  color: #c9e3eb;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.group {
+  margin-top: 18px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 10px;
+  color: #ccebf0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.buttons button,
+.reset {
+  border: 1px solid rgba(180, 233, 239, 0.25);
+  border-radius: 10px;
+  padding: 10px 13px;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: #d4eaf0;
+
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.buttons button:hover,
+.reset:hover {
+  background: rgba(143, 226, 232, 0.14);
+}
+
+.buttons button.active {
+  border-color: #8fe2e8;
+  background: rgba(143, 226, 232, 0.22);
+  color: #fff0d9;
+}
+
+.slider {
+  display: block;
+  width: 100%;
+  accent-color: #59dce8;
+}
+
+.hint {
+  margin-top: 7px;
+  color: #a9cbd3;
+  font-size: 11px;
+}
+
+.reset {
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .panel {
+    left: 16px;
+    bottom: 16px;
+    padding: 18px;
+  }
+}

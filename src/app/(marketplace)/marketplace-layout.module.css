@@ -1,0 +1,235 @@
+.shell {
+  --kitcart-navy: #071b2d;
+  --kitcart-ocean: #0b3650;
+  --kitcart-cyan: #59dce8;
+  --kitcart-cream: #fff0d9;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: clip;
+
+  background:
+    radial-gradient(
+      ellipse 95% 72% at 18% 18%,
+      rgba(26, 118, 141, 0.56),
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 85% 35%,
+      rgba(25, 104, 140, 0.35),
+      transparent 85%
+    ),
+    linear-gradient(
+      145deg,
+      #0b3650 0%,
+      #0b3046 44%,
+      #071b2d 100%
+    );
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.baseGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background:
+    radial-gradient(
+      ellipse 65% 48% at 14% 12%,
+      rgba(112, 228, 236, 0.22),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 75% 58% at 78% 4%,
+      rgba(54, 156, 202, 0.15),
+      transparent 80%
+    );
+}
+
+.auroraLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+
+  opacity: 0.85;
+  mix-blend-mode: screen;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.68) 75%,
+    transparent 100%
+  );
+
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.68) 75%,
+    transparent 100%
+  );
+}
+
+.auroraLayer > div,
+.auroraLayer canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.pillarLayer {
+  position: absolute;
+  top: 22vh;
+  left: -6%;
+  z-index: 2;
+
+  width: 112%;
+  height: 70vh;
+
+  opacity: 0.88;
+
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      transparent 0%,
+      #000 12%,
+      #000 88%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 30%,
+      #000 72%,
+      transparent 100%
+    );
+
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent 0%,
+      #000 12%,
+      #000 88%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 30%,
+      #000 72%,
+      transparent 100%
+    );
+
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.pillarLayer > div,
+.pillarLayer canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.creamAtmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  background:
+    radial-gradient(
+      ellipse 80% 22% at 45% 65%,
+      rgba(255, 240, 217, 0.10),
+      transparent 82%
+    ),
+    radial-gradient(
+      ellipse 65% 38% at -10% 47%,
+      rgba(89, 220, 232, 0.11),
+      transparent 85%
+    );
+
+  mix-blend-mode: screen;
+}
+
+.lowerFade {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(7, 27, 45, 0.025) 55%,
+    rgba(7, 27, 45, 0.27) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+}
+
+/* Keep the existing homepage design, but allow
+   the React Bits shader layers to show through. */
+
+.content > :first-child {
+  background: transparent !important;
+}
+
+@media (max-width: 900px) {
+  .auroraLayer {
+    opacity: 0.75;
+  }
+
+  .pillarLayer {
+    top: 28vh;
+    left: -12%;
+    width: 124%;
+    height: 58vh;
+    opacity: 0.75;
+  }
+
+  .creamAtmosphere {
+    opacity: 0.75;
+  }
+}
+
+@media (max-width: 600px) {
+  .auroraLayer {
+    opacity: 0.68;
+  }
+
+  .pillarLayer {
+    top: 30vh;
+    height: 48vh;
+    opacity: 0.68;
+  }
+
+  .lowerFade {
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(7, 27, 45, 0.35)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auroraLayer {
+    opacity: 0.65;
+  }
+
+  .pillarLayer {
+    opacity: 0.65;
+  }
+}

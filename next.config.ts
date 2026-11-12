@@ -1,22 +1,17 @@
-
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Hide the Next.js development indicator.
   devIndicators: false,
 
-  // Preserve existing KitCart configuration.
+  // Preserve KitCart caching configuration.
   cacheComponents: true,
   partialPrefetching: true,
 
+  // Use Next.js standard CSS Module processing.
+  // Do not override all CSS files with a Turbopack loader.
   turbopack: {
     root: process.cwd(),
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
   },
 };
 
