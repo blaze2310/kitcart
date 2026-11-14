@@ -989,3 +989,39 @@
 }
 
 .marketplace a.sellerButton { color: #102c3b; }
+
+/* Discover pet and its shared tile dimensions. */
+.heroArtwork[data-discover-pet-tiles] {
+  --dashboard-width: 188px;
+  --dashboard-height: 140px;
+  --tile-top: 60px;
+  z-index: 3;
+}
+.heroArtwork[data-discover-pet-tiles] .analyticsTile {
+  width: var(--dashboard-width);
+  height: var(--dashboard-height);
+  top: var(--tile-top);
+}
+.heroArtwork[data-discover-pet-tiles] .workflowTile { bottom: 31px; }
+.heroArtwork[data-discover-pet-tiles] .categoryTile { bottom: 3px; }
+@media (max-width: 1020px) {
+  .hero:has([data-discover-pet-tiles]) { display: block; }
+  .heroArtwork[data-discover-pet-tiles] {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(425px, 100%);
+    height: 296px;
+    margin: 10px auto 0;
+    opacity: 1;
+    transform: none;
+    container-type: inline-size;
+    --tile-top: 20px;
+  }
+  .heroArtwork[data-discover-pet-tiles] .analyticsTile {
+    --dashboard-width: min(188px, 45cqw);
+    right: 12%;
+  }
+  .heroArtwork[data-discover-pet-tiles] .workflowTile { width: min(176px, 46cqw); bottom: 22px; }
+  .heroArtwork[data-discover-pet-tiles] .categoryTile { width: min(148px, 43cqw); bottom: 0; }
+}

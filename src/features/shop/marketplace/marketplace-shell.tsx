@@ -26,6 +26,7 @@ import {
 import CartDrawer, { type CartItem } from "./cart-drawer";
 import { flyCartIcon } from "./cart-flight";
 import cartStyles from "./cart-drawer.module.css";
+import HeroPet from "@/features/robot/pet/hero-pet";
 import styles from "./home.module.css";
 import shellStyles from "./marketplace-shell.module.css";
 
@@ -201,59 +202,62 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
       <div className={`${styles.marketplace} ${shellStyles.surface}`}>
         <div className={cartStyles.frame} data-cart-open={cartOpen}>
         <div className={styles.container}>
-          <header className={styles.header}>
-            <MarketplaceLink
-              href="/"
-              className={styles.brand}
-              aria-label="KitCart home"
-              onRoute={closeNavigation}
-            >
-              <span className={styles.brandLockup}>
-                <Image
-                  src="/kitcart-brand/kitcart_full_light.svg" width={1200} height={492}
-                  alt="From a Dot to a Star."
-                  unoptimized
-                />
-              </span>
-            </MarketplaceLink>
+          <div className={shellStyles.petHeaderRow}>
+            <HeroPet pathname={pathname} cartOpen={cartOpen} />
+            <header className={styles.header}>
+              <MarketplaceLink
+                href="/"
+                className={styles.brand}
+                aria-label="KitCart home"
+                onRoute={closeNavigation}
+              >
+                <span className={styles.brandLockup}>
+                  <Image
+                    src="/kitcart-brand/kitcart_full_light.svg" width={1200} height={492}
+                    alt="From a Dot to a Star."
+                    unoptimized
+                  />
+                </span>
+              </MarketplaceLink>
 
-            <nav className={styles.desktopNav} aria-label="Main navigation">
-              {navLinks()}
-            </nav>
+              <nav className={styles.desktopNav} aria-label="Main navigation">
+                {navLinks()}
+              </nav>
 
-            <MarketplaceSearch onRoute={closeNavigation} />
+              <MarketplaceSearch onRoute={closeNavigation} />
 
-            <MarketplaceLink href="/sell" className={styles.sellerButton} onRoute={closeNavigation}>
-              Start selling <ArrowUpRight size={15} aria-hidden="true" />
-            </MarketplaceLink>
+              <MarketplaceLink href="/sell" className={styles.sellerButton} onRoute={closeNavigation}>
+                Start selling <ArrowUpRight size={15} aria-hidden="true" />
+              </MarketplaceLink>
 
-            <button type="button" ref={navCart} className={styles.navIcon} aria-label="Shopping cart"
-              aria-controls="marketplace-cart" aria-expanded={cartOpen}
-              onClick={() => {
-                if (cartOpen) closeCart();
-                else {
-                  flightToken.current++;
-                  returnFocus.current = navCart.current;
-                  setCartOpen(true);
-                }
-              }}>
-              <ShoppingCart size={19} aria-hidden="true" />
-            </button>
+              <button type="button" ref={navCart} className={styles.navIcon} aria-label="Shopping cart"
+                aria-controls="marketplace-cart" aria-expanded={cartOpen}
+                onClick={() => {
+                  if (cartOpen) closeCart();
+                  else {
+                    flightToken.current++;
+                    returnFocus.current = navCart.current;
+                    setCartOpen(true);
+                  }
+                }}>
+                <ShoppingCart size={19} aria-hidden="true" />
+              </button>
 
-            <Link href="/login" className={styles.navIcon} aria-label="Sign in">
-              <UserRound size={19} aria-hidden="true" />
-            </Link>
+              <Link href="/login" className={styles.navIcon} aria-label="Sign in">
+                <UserRound size={19} aria-hidden="true" />
+              </Link>
 
-            <button
-              type="button"
-              className={styles.mobileMenuButton}
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
-            </button>
-          </header>
+              <button
+                type="button"
+                className={styles.mobileMenuButton}
+                aria-expanded={menuOpen}
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+              </button>
+            </header>
+          </div>
 
           {menuOpen && (
             <nav className={styles.mobileMenu} aria-label="Mobile navigation">

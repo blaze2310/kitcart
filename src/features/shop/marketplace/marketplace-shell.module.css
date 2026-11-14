@@ -33,3 +33,78 @@
   text-decoration: underline;
   text-underline-offset: 0.3em;
 }
+
+/* Keep the dock in the brand group so it never covers a navigation item. */
+.petBrandGroup {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.petBrandGroup > a {
+  min-width: 0;
+  margin: 0;
+}
+@media (max-width: 900px) {
+  .petBrandGroup { margin-inline-end: auto; }
+}
+@media (max-width: 440px) {
+  .petBrandGroup img { width: clamp(62px, calc(100vw - 250px), 145px); height: auto; }
+}
+
+/* Full-size pet at the left of the storefront, with clear space under the logo row. */
+.stage {
+  padding-block-start: 100px;
+}
+.stage:has([data-discover-pet-tiles]) {
+  padding-block-start: 30px;
+}
+@media (max-width: 600px) {
+  .stage:has([data-discover-pet-tiles]) { padding-block-start: 52px; }
+}
+@media (max-width: 380px) {
+  .surface header:has(.petBrandGroup) { padding-inline: 10px; gap: 8px; }
+}
+
+/* Keep the left dock and navigation clear at the narrowest widths. */
+@media (max-width: 380px) {
+  .petBrandGroup img { width: clamp(62px, calc(100vw - 264px), 145px); }
+}
+
+/* The dock is a sibling of the glass navbar. It is never inside the glass. */
+.petHeaderRow {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
+  margin-block-start: 24px;
+}
+.petHeaderRow > header { margin-block-start: 0; min-width: 0; }
+.petHeaderRow > header > a:first-child { min-width: 0; flex-shrink: 0; }
+@media (min-width: 1180px) {
+  .petHeaderRow { margin-inline-start: clamp(-124px, calc((1280px - 100vw) / 2 + 32px), 0px); }
+}
+@media (max-width: 1010px) and (min-width: 901px) {
+  .petHeaderRow > header { gap: 8px; padding-inline: 12px; }
+}
+@media (max-width: 600px) {
+  .petHeaderRow {
+    grid-template-columns: clamp(90px, 19vw, 100px) minmax(0, 1fr);
+    column-gap: 8px;
+    margin-block-start: 14px;
+  }
+  .petHeaderRow > header { padding-inline: 9px; gap: 7px; }
+  .petHeaderRow > header > a:first-child img {
+    width: clamp(45px, calc(100vw - 275px), 145px);
+    height: auto;
+  }
+}
+@media (min-width: 901px) and (max-width: 1010px) {
+  .petHeaderRow > header > form { display: none; }
+}
+@media (max-width: 380px) {
+  .petHeaderRow > header { padding-inline: 7px; gap: 6px; }
+  .petHeaderRow > header > button,
+  .petHeaderRow > header > a:not(:first-child) { width: 32px; }
+}

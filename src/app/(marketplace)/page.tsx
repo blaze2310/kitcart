@@ -34,8 +34,8 @@ export default function DiscoverPage() {
           </div>
         </div>
 
-        <div className={styles.heroArtwork} aria-hidden="true">
-          <div className={`${styles.floatingTile} ${styles.analyticsTile}`}>
+        <div className={styles.heroArtwork} data-discover-pet-tiles="">
+          <div className={`${styles.floatingTile} ${styles.analyticsTile}`} aria-hidden="true">
             <span>ANALYTICS DASHBOARD</span>
             <div className={styles.heroBars}>
               {[35, 58, 49, 77, 64, 91, 72].map((height, index) => (
@@ -44,7 +44,7 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          <div className={`${styles.floatingTile} ${styles.workflowTile}`}>
+          <div className={`${styles.floatingTile} ${styles.workflowTile}`} aria-hidden="true">
             <span>WORKFLOW READY</span>
             <div>
               <Workflow size={17} />
@@ -55,7 +55,7 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          <div className={`${styles.floatingTile} ${styles.categoryTile}`}>
+          <div className={`${styles.floatingTile} ${styles.categoryTile}`} aria-hidden="true">
             <strong>13 CATEGORIES</strong>
             <small>More ways to create</small>
           </div>
