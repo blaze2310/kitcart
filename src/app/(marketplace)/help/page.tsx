@@ -15,7 +15,7 @@ export default function HelpPage() {
         </div>
       </div>
 
-      <section className={styles.infoCard} aria-label="What you can do now">
+      <section id="creator-onboarding" className={styles.infoCard} aria-label="What you can do now">
         <Sparkles size={26} aria-hidden="true" />
         <h2>What you can do now</h2>
         <p>

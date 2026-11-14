@@ -1,107 +1,92 @@
 import { Suspense } from "react";
-import { ArrowUpRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
-import { ProductCard, products } from "@/features/shop/marketplace/demo-catalogue";
+import { ProductCard, catalogueCategories, catalogueProducts } from "@/features/shop/marketplace/demo-catalogue";
+import ExploreFilters from "@/features/shop/marketplace/explore-filters";
 import { MarketplaceLink } from "@/features/shop/marketplace/marketplace-shell";
 import styles from "@/features/shop/marketplace/home.module.css";
 import shellStyles from "@/features/shop/marketplace/marketplace-shell.module.css";
 
-const categories = [
-  "Website & Web Design",
-  "Automation & Workflows",
-  "Presentations & Slides",
-  "Career & Professional Documents",
-  "Dashboards & Data Visualization",
-  "Trading Strategies & Scripts",
-  "Ebooks & Guides",
-  "AI Video & Prompt Packs",
-  "Spreadsheets & Calculators",
-  "Social Media & Marketing Assets",
-  "Graphic Design & Creative Assets",
-  "Code & Developer Resources",
-  "No-Code & App Templates",
-];
+const PAGE_SIZE = 12;
+type Parameter = string | string[] | undefined;
+type Query = Promise<{ q?: Parameter; category?: Parameter; subcategory?: Parameter; page?: Parameter }>;
 
-const categoryByType = {
-  website: "Website & Web Design",
-  automation: "Automation & Workflows",
-  slides: "Presentations & Slides",
-  analytics: "Dashboards & Data Visualization",
-};
+const groups = catalogueCategories.map((name) => ({
+  name,
+  children: [...new Set(catalogueProducts.filter((product) => product.group === name).map((product) => product.subcategory))],
+}));
 
-type Query = Promise<{ q?: string | string[]; category?: string | string[] }>;
-
-function first(value?: string | string[]) {
-  return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
+function values(value: Parameter) {
+  return (Array.isArray(value) ? value : value ? [value] : []).map((item) => item.trim()).filter(Boolean);
 }
 
 async function Catalogue({ searchParams }: { searchParams: Query }) {
   const params = await searchParams;
-  const query = first(params.q);
-  const category = first(params.category);
-  const searchTerms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const matches = products.filter((product) => {
-    const group = categoryByType[product.type];
-    const text = [
-      product.title,
-      product.category,
-      product.creator,
-      product.description,
-      group,
-    ].join(" ").toLowerCase();
-    return (!category || category === group) && searchTerms.every((term) => text.includes(term));
+  const query = values(params.q)[0] ?? "";
+  const requestedCategories = new Set(values(params.category));
+  const categories = catalogueCategories.filter((name) => requestedCategories.has(name));
+  const allowedGroups = groups.filter(({ name }) => !categories.length || categories.includes(name));
+  const requestedSubcategories = new Set(values(params.subcategory));
+  const subcategories = allowedGroups.flatMap(({ children }) => children).filter((name) => requestedSubcategories.has(name));
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+
+  const matches = catalogueProducts.filter((product) => {
+    const text = [product.title, product.group, product.subcategory, product.category,
+      product.creator, product.description].join(" ").toLowerCase();
+    return (!categories.length || categories.includes(product.group)) &&
+      (!subcategories.length || subcategories.includes(product.subcategory)) &&
+      terms.every((term) => text.includes(term));
   });
 
-  function categoryLink(name: string) {
-    const filters = new URLSearchParams({ category: name });
+  const totalPages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
+  const pageNumber = Math.max(1, Math.min(totalPages, Number.parseInt(values(params.page)[0] ?? "", 10) || 1));
+  const visible = matches.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
+  const title = subcategories.length === 1 ? subcategories[0]
+    : categories.length === 1 && !subcategories.length ? categories[0]
+    : query ? "Search results" : "Demo products";
+
+  function pageLink(number: number) {
+    const filters = new URLSearchParams();
     if (query) filters.set("q", query);
-    return `/explore?${filters}`;
+    categories.forEach((name) => filters.append("category", name));
+    subcategories.forEach((name) => filters.append("subcategory", name));
+    if (number > 1) filters.set("page", String(number));
+    return filters.size ? `/explore?${filters}` : "/explore";
   }
 
   return (
     <>
-      <section className={styles.categoriesSection} aria-label="Categories">
-        <div className={styles.categoryGrid}>
-          {categories.map((name, index) => (
-            <MarketplaceLink
-              key={name}
-              href={categoryLink(name)}
-              className={styles.categoryItem}
-              aria-current={category === name ? "true" : undefined}
-            >
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{name}</strong>
-              <ArrowUpRight size={16} aria-hidden="true" />
-            </MarketplaceLink>
-          ))}
-        </div>
-      </section>
-
+      <ExploreFilters key={JSON.stringify([query, categories, subcategories, pageNumber])}
+        groups={groups} categories={categories} subcategories={subcategories} query={query} />
       <section className={styles.productsSection} aria-labelledby="explore-results">
         <div className={styles.sectionHeading}>
           <div>
-            <h2 id="explore-results">{category || (query ? "Search results" : "Demo products")}</h2>
-            {query && <p>Showing concept listings matching “{query}”.</p>}
+            <h2 id="explore-results">{title}</h2>
+            <p>{matches.length} demo {matches.length === 1 ? "product" : "products"}{query ? ` matching “${query}”` : ""}</p>
           </div>
-          {(query || category) && (
-            <MarketplaceLink href="/explore" className={styles.infoLink}>
-              Clear filters
-            </MarketplaceLink>
+          {(query || categories.length > 0 || subcategories.length > 0) && (
+            <MarketplaceLink href="/explore" className={styles.infoLink}>Clear filters</MarketplaceLink>
           )}
         </div>
 
-        {matches.length ? (
+        {visible.length > 0 ? (
           <div className={styles.productGrid}>
-            {matches.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {visible.map((product) => <ProductCard key={product.id} product={product} />)}
           </div>
         ) : (
           <div className={styles.emptyState}>
-            <Search size={27} aria-hidden="true" />
+            <Search size={27} aria-hidden />
             <h3>No matching demo products</h3>
-            <p>Try a different search or explore another category.</p>
+            <p>Try another search or change the filters.</p>
           </div>
+        )}
+
+        {totalPages > 1 && (
+          <nav className={styles.demoFilters} aria-label="Catalogue pages">
+            {pageNumber > 1 && <MarketplaceLink href={pageLink(pageNumber - 1)}>Previous</MarketplaceLink>}
+            <span>Page {pageNumber} of {totalPages}</span>
+            {pageNumber < totalPages && <MarketplaceLink href={pageLink(pageNumber + 1)}>Next</MarketplaceLink>}
+          </nav>
         )}
       </section>
     </>
@@ -115,10 +100,9 @@ export default function ExplorePage({ searchParams }: { searchParams: Query }) {
         <div>
           <span className={styles.eyebrow}>EXPLORE YOUR POSSIBILITIES</span>
           <h1>Explore digital products</h1>
-          <p>Browse 13 categories and see what is available in the demo catalogue.</p>
+          <p>Browse 13 categories and 23 subcategories in the demo catalogue.</p>
         </div>
       </div>
-
       <Suspense fallback={<p role="status">Loading demo products…</p>}>
         <Catalogue searchParams={searchParams} />
       </Suspense>

@@ -46,7 +46,7 @@ export default function MarketplaceLayout({ children }: { children: ReactNode })
             blend={0.5}
             height={0.45}
             speed={0.7}
-            glow={0.65}
+            glow={0.4}
             brightness={0.64}
             mouseInteraction={true}
           />
@@ -56,9 +56,9 @@ export default function MarketplaceLayout({ children }: { children: ReactNode })
           <LightPillar
             topColor="#22d3ee"
             bottomColor="#e0f2fe"
-            intensity={0.7}
+            intensity={0.4}
             glowAmount={0.0006}
-            bloom={0.4}
+            bloom={0.5}
             pillarWidth={1.5}
             pillarHeight={0.4}
             pillarRotation={-15}

@@ -1,0 +1,53 @@
+.frame {
+  --drawer-size: min(21rem, 26vw);
+  margin-inline-end: 0;
+  transition: margin-inline-end 340ms cubic-bezier(.22,.75,.28,1);
+}
+.frame[data-cart-open="true"] { margin-inline-end: var(--drawer-size); }
+
+.drawer {
+  position: fixed;
+  z-index: 20;
+  inset: 0 0 0 auto;
+  width: var(--drawer-size, min(21rem, 26vw));
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border-left: 1px solid #e7faff75;
+  background: linear-gradient(145deg, #dcf7f43b, #d1f0fc12), #0b263985;
+  box-shadow: inset 1px 0 #ffffff35, -18px 0 50px #0006;
+  backdrop-filter: blur(15px) saturate(1.4);
+  color: #faf8f3;
+  transform: translateX(102%);
+  visibility: hidden;
+  transition: transform 340ms cubic-bezier(.22,.75,.28,1), visibility 0s linear 340ms;
+}
+.drawer[data-open="true"] { transform: translateX(0); visibility: visible; transition-delay: 0s; }
+.drawerHeader, .total { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.drawerHeader h2 { display: flex; align-items: center; gap: 9px; font-size: 23px; font-weight: 800; }
+.drawerHeader button {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid #e7faff65; color: #fff; background: #fff1;
+}
+.drawerBody { flex: 1; min-height: 0; overflow: auto; padding: 20px 0; }
+.lineItem { padding: 15px; border-radius: 14px; border: 1px solid #e7faff55; background: #daf7ff12; }
+.label { font-size: 11px; font-weight: 800; letter-spacing: .07em; color: #b6eff2; }
+.lineItem h3 { margin-top: 4px; font-size: 18px; font-weight: 800; }
+.lineItem p, .drawerFooter p { margin-top: 6px; color: #e0edf4; font-size: 14px; line-height: 1.5; }
+.lineItem strong { display: block; margin-top: 12px; font-size: 18px; }
+.drawerFooter { border-top: 1px solid #e7faff60; padding-top: 16px; }
+.total { font-weight: 800; margin-bottom: 12px; }
+.total strong { font-size: 23px; }
+.drawer .buy {
+  display: flex; justify-content: center; align-items: center; min-height: 46px;
+  padding: 8px 14px; border-radius: 12px; background: #8fe2e8;
+  color: #102a3a; font-weight: 850;
+}
+.drawer .buy:hover { background: #b3f1f3; }
+
+@media (max-width: 940px) {
+  .frame[data-cart-open="true"] { margin-inline-end: 0; }
+  .drawer { width: min(21rem, 100%); }
+}
+@media (prefers-reduced-motion: reduce) { .drawer, .frame { transition: none; } }

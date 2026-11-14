@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -22,10 +23,19 @@ import {
   X,
 } from "lucide-react";
 
+import CartDrawer, { type CartItem } from "./cart-drawer";
+import { flyCartIcon } from "./cart-flight";
+import cartStyles from "./cart-drawer.module.css";
 import styles from "./home.module.css";
 import shellStyles from "./marketplace-shell.module.css";
 
 const NavigationContext = createContext<((href: string) => void) | null>(null);
+const CartContext = createContext<((item: CartItem, source: SVGElement | null, trigger: HTMLButtonElement) => Promise<void>) | null>(null);
+
+export function useMarketplaceCart() {
+  return useContext(CartContext);
+}
+
 const navigation = [
   { href: "/", label: "Discover" },
   { href: "/explore", label: "Explore" },
@@ -82,6 +92,8 @@ export function MarketplaceSearch({
     >
       <Search size={hero ? 19 : 16} aria-hidden="true" />
       <input
+        type="search"
+        autoComplete="off"
         name="q"
         aria-label={hero ? "Find digital products" : "Search digital products"}
         placeholder={
@@ -104,7 +116,6 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
   const activeExit = useRef<Animation | null>(null);
   const [isPending, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!isPending && activeExit.current?.playState === "finished") {
@@ -146,14 +157,29 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
     );
   }
 
-  function closeNavigation() {
-    setMenuOpen(false);
-    setMessage("");
+  const [cartItem, setCartItem] = useState<CartItem | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const navCart = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
+  const flightToken = useRef(0);
+
+  function closeCart() {
+    flightToken.current++;
+    setCartOpen(false);
+    returnFocus.current?.focus({ preventScroll: true });
   }
 
-  function showComingSoon(feature: string) {
+  async function addToCart(item: CartItem, source: SVGElement | null, trigger: HTMLButtonElement) {
+    const token = ++flightToken.current;
+    setCartItem(item);
+    returnFocus.current = trigger;
+    if (!cartOpen) await flyCartIcon(source, navCart.current);
+    if (flightToken.current === token) setCartOpen(true);
+  }
+
+  function closeNavigation() {
     setMenuOpen(false);
-    setMessage(`${feature} will be connected during the next marketplace development stages.`);
+    closeCart();
   }
 
   function navLinks() {
@@ -171,7 +197,9 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
 
   return (
     <NavigationContext.Provider value={navigate}>
+      <CartContext.Provider value={addToCart}>
       <div className={`${styles.marketplace} ${shellStyles.surface}`}>
+        <div className={cartStyles.frame} data-cart-open={cartOpen}>
         <div className={styles.container}>
           <header className={styles.header}>
             <MarketplaceLink
@@ -180,10 +208,12 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
               aria-label="KitCart home"
               onRoute={closeNavigation}
             >
-              <span className={styles.brandIcon}>K</span>
-              <span className={styles.brandWords}>
-                <strong>kitcart.</strong>
-                <small>THE DIGITAL MARKETPLACE</small>
+              <span className={styles.brandLockup}>
+                <Image
+                  src="/kitcart-brand/kitcart_full_light.svg" width={1200} height={492}
+                  alt="From a Dot to a Star."
+                  unoptimized
+                />
               </span>
             </MarketplaceLink>
 
@@ -193,20 +223,20 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
 
             <MarketplaceSearch onRoute={closeNavigation} />
 
-            <button
-              type="button"
-              className={styles.sellerButton}
-              onClick={() => showComingSoon("Seller onboarding")}
-            >
+            <MarketplaceLink href="/sell" className={styles.sellerButton} onRoute={closeNavigation}>
               Start selling <ArrowUpRight size={15} aria-hidden="true" />
-            </button>
+            </MarketplaceLink>
 
-            <button
-              type="button"
-              className={styles.navIcon}
-              aria-label="Shopping cart"
-              onClick={() => showComingSoon("Shopping cart")}
-            >
+            <button type="button" ref={navCart} className={styles.navIcon} aria-label="Shopping cart"
+              aria-controls="marketplace-cart" aria-expanded={cartOpen}
+              onClick={() => {
+                if (cartOpen) closeCart();
+                else {
+                  flightToken.current++;
+                  returnFocus.current = navCart.current;
+                  setCartOpen(true);
+                }
+              }}>
               <ShoppingCart size={19} aria-hidden="true" />
             </button>
 
@@ -229,26 +259,18 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
             <nav className={styles.mobileMenu} aria-label="Mobile navigation">
               {navLinks()}
               <Link href="/login">Sign in</Link>
-              <button type="button" onClick={() => showComingSoon("Seller onboarding")}>
-                Start selling
-              </button>
+              <MarketplaceLink href="/sell" onRoute={closeNavigation}>Start selling</MarketplaceLink>
             </nav>
-          )}
-
-          {message && (
-            <div className={styles.message} role="status">
-              <span>{message}</span>
-              <button type="button" aria-label="Dismiss message" onClick={() => setMessage("")}>
-                <X size={17} aria-hidden="true" />
-              </button>
-            </div>
           )}
 
           <div key={pathname} ref={stageRef} className={shellStyles.stage}>
             {children}
           </div>
         </div>
+        <CartDrawer item={cartItem} open={cartOpen} onClose={closeCart} onRemove={() => setCartItem(null)} />
+        </div>
       </div>
+      </CartContext.Provider>
     </NavigationContext.Provider>
   );
 }

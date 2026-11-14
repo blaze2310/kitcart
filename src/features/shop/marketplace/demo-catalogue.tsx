@@ -7,6 +7,9 @@ import {
   Workflow,
 } from "lucide-react";
 
+import DemoArt from "./demo-art";
+import { MarketplaceLink } from "./marketplace-shell";
+import detailStyles from "./product-detail.module.css";
 import styles from "./home.module.css";
 
 type Product = {
@@ -17,6 +20,7 @@ type Product = {
   price: number;
   creator: string;
   description: string;
+  demoCover?: boolean;
 };
 
 export const products: Product[] = [
@@ -57,6 +61,54 @@ export const products: Product[] = [
     description: "An editable presentation template collection.",
   },
 ];
+
+// Three listings per subcategory. A number reuses an original Discover card.
+type SeedGroup = [string, string, Product["type"], string, Array<string | number>];
+const seedGroups: SeedGroup[] = [
+  ["Website & Web Design", "Website & Landing Page Templates", "website", "Responsive layouts for launching and presenting a website.", [3, "Fieldwork Portfolio", "Launchline Landing Page"]],
+  ["Website & Web Design", "UI Kits & Design Files", "website", "Editable design components for prototyping interfaces.", ["Prism Interface Kit", "Orbit Mobile UI", "Canvas Wireframe Library"]],
+  ["Automation & Workflows", "Downloadable Workflow Files", "automation", "Demo workflows for common repetitive tasks.", [2, "Invoice Intake Flow", "Support Ticket Router"]],
+  ["Automation & Workflows", "Shared Automation Templates", "automation", "Reusable workflow blueprints for connecting everyday tools.", ["Lead Handoff Blueprint", "Content Approval Flow", "Weekly Digest Builder"]],
+  ["Automation & Workflows", "Automation Scripts", "automation", "Small utility scripts for organizing and processing files.", ["Batch Rename Toolkit", "CSV Cleanup Scripts", "Scheduled Folder Tidy"]],
+  ["Presentations & Slides", "Editable Presentation Templates", "slides", "Editable slide layouts for communicating ideas clearly.", [4, "Boardroom Brief Deck", "Case Study Slides"]],
+  ["Career & Professional Documents", "Professional Document Templates", "slides", "Editable documents for applications and career planning.", ["Meridian Résumé", "Cover Letter Studio", "Interview Story Workbook"]],
+  ["Dashboards & Data Visualization", "BI Dashboard Templates", "analytics", "Dashboard layouts for exploring business performance.", [1, "Inventory Signal Dashboard", "Campaign Performance Board"]],
+  ["Dashboards & Data Visualization", "Code-Based Dashboards", "analytics", "Dashboard concepts for building data views with code.", ["Streamlit Metrics Lab", "Plotly Sales Explorer", "React KPI Console"]],
+  ["Trading Strategies & Scripts", "Trading Indicators & Signals", "analytics", "Illustrative market-analysis concepts using demo data.", ["Volatility Range Visualizer", "Trend Overlay Lab", "Volume Pattern Notebook"]],
+  ["Trading Strategies & Scripts", "Trading Strategies & Bots", "analytics", "Paper-trading concepts for learning about simulated rules.", ["Paper Strategy Sandbox", "Backtest Journal Kit", "Rebalance Simulator"]],
+  ["Ebooks & Guides", "Ebooks & Instruction Guides", "slides", "A structured reference for learning or practising a skill.", ["Freelancer Setup Guide", "SQL Practice Handbook", "Digital Product Launch Playbook"]],
+  ["AI Video & Prompt Packs", "AI Prompt Packs", "slides", "Prompt collections for developing creative briefs and scenes.", ["Storyboard Prompt Pack", "Product Shot Prompt Studio", "Video Scene Prompt Cards"]],
+  ["Spreadsheets & Calculators", "Spreadsheet & Calculator Templates", "analytics", "Editable spreadsheet concepts for tracking and planning.", ["Cash Flow Planner", "Freelance Rate Calculator", "Inventory Reorder Sheet"]],
+  ["Social Media & Marketing Assets", "Editable Marketing Design Templates", "slides", "Editable visual assets for publishing across channels.", ["Carousel Design Kit", "Launch Campaign Templates", "Newsletter Layout Studio"]],
+  ["Social Media & Marketing Assets", "Marketing Content & Copy Kits", "slides", "Writing frameworks for campaigns and product messaging.", ["Product Launch Copy Kit", "Email Sequence Workbook", "Content Calendar Prompts"]],
+  ["Graphic Design & Creative Assets", "2D Graphic Assets & Mockups", "website", "Visual assets for illustrating and presenting design work.", ["Terra Icon Set", "Studio Device Mockups", "Contour Texture Pack"]],
+  ["Graphic Design & Creative Assets", "Fonts, Presets & LUTs", "website", "Concept packs for typography and visual treatments.", ["Monoform Type Specimen", "Softgrain Photo Presets", "Twilight Colour LUTs"]],
+  ["Graphic Design & Creative Assets", "3D Models", "website", "Sample asset concepts for building scenes and mockups.", ["Low-Poly Desk Props", "Modular Shop Interior", "Isometric Device Models"]],
+  ["Code & Developer Resources", "Code Snippets & Libraries", "automation", "Reusable building blocks for everyday development tasks.", ["TypeScript Utility Kit", "Accessible Form Components", "Date Formatting Helpers"]],
+  ["Code & Developer Resources", "Starter Projects & Developer Tools", "website", "Starter resources for prototyping and testing software.", ["Next.js Starter Workspace", "API Test Fixture Kit", "CLI Project Blueprint"]],
+  ["No-Code & App Templates", "Workspace & Database Templates", "analytics", "Prestructured workspaces for managing projects and records.", ["Notion Project Hub", "Airtable Content Planner", "Client Intake Workspace"]],
+  ["No-Code & App Templates", "No-Code App Templates", "website", "Prototype layouts for building apps without custom code.", ["Glide Inventory App", "Bubble Booking Prototype", "Softr Member Portal"]],
+];
+
+export const catalogueCategories = [...new Set(seedGroups.map(([category]) => category))];
+
+export const catalogueProducts = seedGroups.flatMap(
+  ([group, subcategory, type, description, entries], groupIndex) =>
+    entries.map((entry, itemIndex) => {
+      const original = typeof entry === "number" ? products.find(({ id }) => id === entry) : undefined;
+      const product: Product = original ?? {
+        id: 100 + groupIndex * 3 + itemIndex,
+        title: String(entry),
+        category: subcategory,
+        type,
+        price: 299 + ((groupIndex + itemIndex) % 8) * 150,
+        creator: "KitCart Demo Studio",
+        description,
+        demoCover: true,
+      };
+      return { ...product, group, subcategory };
+    }),
+);
 
 function ProductPreview({ type }: { type: Product["type"] }) {
   if (type === "analytics") {
@@ -144,10 +196,20 @@ function ProductPreview({ type }: { type: Product["type"] }) {
   );
 }
 
+export function CataloguePreview({ product }: { product: Product }) {
+  return product.demoCover ? (
+    <div className={styles.preview}>
+      <DemoArt id={product.id} group={product.category} />
+    </div>
+  ) : <ProductPreview type={product.type} />;
+}
+
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <article className={styles.productCard}>
-      <ProductPreview type={product.type} />
+    <MarketplaceLink href={`/products/${product.id}`} prefetch={false}
+      className={`${styles.productCard} ${detailStyles.cardLink}`}
+      aria-label={`View ${product.title}`}>
+      <CataloguePreview product={product} />
       <div className={styles.productInfo}>
         <span className={styles.productCategory}>
           {product.category}
@@ -162,6 +224,6 @@ export function ProductCard({ product }: { product: Product }) {
           Concept listing · Preview only
         </span>
       </div>
-    </article>
+    </MarketplaceLink>
   );
 }
