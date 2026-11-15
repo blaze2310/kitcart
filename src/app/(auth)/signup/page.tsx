@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Info, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { useAuthRobot } from "@/features/auth/components/AuthShell";
+import BirthDatePicker, { isValidBirthDate } from "@/features/auth/components/BirthDatePicker";
 import CodeSlots from "@/features/auth/components/CodeSlots";
 import "@/features/auth/styles/signup-modal.css";
 
@@ -14,6 +15,8 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [birthDateInvalid, setBirthDateInvalid] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [notice, setNotice] = useState("");
@@ -21,9 +24,14 @@ export default function SignupPage() {
   const [channel, setChannel] = useState<Channel>("email");
   const [code, setCode] = useState("");
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const noticeRef = useRef<HTMLParagraphElement>(null);
   const { setUsernameFocused, setPasswordVisible, passwordVisible: visible, sad, wave } = useAuthRobot();
   const modalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (modalTimer.current) clearTimeout(modalTimer.current); }, []);
+
+  useEffect(() => {
+    if (notice) noticeRef.current?.scrollIntoView({ block: "nearest" });
+  }, [notice]);
 
   function checkMismatch() {
     if (!confirm || password === confirm) return;
@@ -39,6 +47,12 @@ export default function SignupPage() {
     event.preventDefault();
     if (!/^[A-Za-z][A-Za-z0-9]*$/.test(username)) return setNotice("Username must begin with a letter and contain only letters and numbers.");
     if (!/^\+[1-9]\d{7,14}$/.test(phone.replace(/[\s()-]/g, ""))) return setNotice("Enter your phone with country code, for example +91 98765 43210.");
+    if (!isValidBirthDate(dateOfBirth)) {
+      setNotice("");
+      setBirthDateInvalid(true);
+      event.currentTarget.querySelector<HTMLButtonElement>("#signup-dob")?.focus();
+      return;
+    }
     if (!passwordValid(password)) return setNotice("Password must contain 8–15 characters, one uppercase letter, one number and one special character.");
     if (password !== confirm) {
       checkMismatch();
@@ -59,36 +73,39 @@ export default function SignupPage() {
 
   return (
     <>
-      <section className="kc-glass kc-auth-card kc-enter" aria-label="Create a KitCart account">
+      <section className="kc-glass kc-auth-card kc-signup-card kc-enter" aria-label="Create a KitCart account">
           <span className="kc-eyebrow"><ShieldCheck size={13} /> JOIN THE KITCART FAMILY</span>
           <h1 className="kc-heading">Create your account<span>.</span></h1>
           <p className="kc-subtitle">Create an account with your email and phone number.</p>
 
           <form className="kc-form kc-signup-form" onSubmit={submit}>
-            <div><label className="kc-field-label" htmlFor="signup-username">Username</label><input id="signup-username" name="username" className="kc-input" required autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} onFocus={() => setUsernameFocused(true)} onBlur={() => setUsernameFocused(false)} placeholder="Choose a username" /></div>
-            <div><label className="kc-field-label" htmlFor="signup-email">Email address</label><input id="signup-email" name="email" className="kc-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></div>
-            <div><label className="kc-field-label" htmlFor="signup-phone">Phone number</label><input id="signup-phone" name="phone" className="kc-input" type="tel" autoComplete="tel" required value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" /></div>
-            <div>
-              <div className="kc-password-label">
-                <label className="kc-field-label" htmlFor="signup-password">Password</label>
-                <span className="kc-password-info">
-                  <button type="button" className="kc-info-trigger" aria-label="View password requirements" aria-describedby="signup-password-rules"><Info size={16} /></button>
-                  <span id="signup-password-rules" role="tooltip" className="kc-password-tooltip">
-                    <strong>Password requirements</strong>
-                    <span>8–15 characters</span>
-                    <span>At least one uppercase letter (A–Z)</span>
-                    <span>At least one number (0–9)</span>
-                    <span>At least one special character (@, #, $, !, %)</span>
+            <div className="kc-signup-fields" role="region" aria-label="Sign-up fields">
+              <div><label className="kc-field-label" htmlFor="signup-username">Username</label><input id="signup-username" name="username" className="kc-input" required autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} onFocus={() => setUsernameFocused(true)} onBlur={() => setUsernameFocused(false)} placeholder="Choose a username" /></div>
+              <div><label className="kc-field-label" htmlFor="signup-email">Email address</label><input id="signup-email" name="email" className="kc-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></div>
+              <div><label className="kc-field-label" htmlFor="signup-phone">Phone number</label><input id="signup-phone" name="phone" className="kc-input" type="tel" autoComplete="tel" required value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" /></div>
+              <BirthDatePicker value={dateOfBirth} invalid={birthDateInvalid} onChange={value => { setDateOfBirth(value); setBirthDateInvalid(false); }} />
+              <div>
+                <div className="kc-password-label">
+                  <label className="kc-field-label" htmlFor="signup-password">Password</label>
+                  <span className="kc-password-info">
+                    <button type="button" className="kc-info-trigger" aria-label="View password requirements" aria-describedby="signup-password-rules"><Info size={16} /></button>
+                    <span id="signup-password-rules" role="tooltip" className="kc-password-tooltip">
+                      <strong>Password requirements</strong>
+                      <span>8–15 characters</span>
+                      <span>At least one uppercase letter (A–Z)</span>
+                      <span>At least one number (0–9)</span>
+                      <span>At least one special character (@, #, $, !, %)</span>
+                    </span>
                   </span>
-                </span>
+                </div>
+                <div className="kc-password">
+                  <input id="signup-password" name="password" className="kc-input" type={visible ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={15} value={password} onChange={e => setPassword(e.target.value)} onBlur={() => { setPasswordVisible(false); }} placeholder="Create a password" />
+                  <button type="button" className="kc-eye" aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} onMouseDown={e => e.preventDefault()} onClick={() => setPasswordVisible(!visible)}>{visible ? <EyeOff size={19} /> : <Eye size={19} />}</button>
+                </div>
               </div>
-              <div className="kc-password">
-                <input id="signup-password" name="password" className="kc-input" type={visible ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={15} value={password} onChange={e => setPassword(e.target.value)} onBlur={() => { setPasswordVisible(false); }} placeholder="Create a password" />
-                <button type="button" className="kc-eye" aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} onMouseDown={e => e.preventDefault()} onClick={() => setPasswordVisible(!visible)}>{visible ? <EyeOff size={19} /> : <Eye size={19} />}</button>
-              </div>
+              <div><label className="kc-field-label" htmlFor="signup-confirm">Confirm password</label><input id="signup-confirm" name="confirmPassword" className="kc-input" type="password" autoComplete="new-password" required maxLength={15} value={confirm} onChange={e => { setConfirm(e.target.value); if (notice === "Passwords do not match.") setNotice(""); }} onBlur={checkMismatch} placeholder="Confirm your password" /></div>
+              {notice && <p ref={noticeRef} className="kc-feedback" role="alert">{notice}</p>}
             </div>
-            <div><label className="kc-field-label" htmlFor="signup-confirm">Confirm password</label><input id="signup-confirm" name="confirmPassword" className="kc-input" type="password" autoComplete="new-password" required maxLength={15} value={confirm} onChange={e => { setConfirm(e.target.value); if (notice === "Passwords do not match.") setNotice(""); }} onBlur={checkMismatch} placeholder="Confirm your password" /></div>
-            {notice && <p className="kc-feedback" role="alert">{notice}</p>}
             <button className="kc-primary-button" type="submit">Create Account <span className="kc-small-arrow" aria-hidden="true">→</span></button>
           </form>
           <p className="kc-footer">Already have an account? <Link href="/login" onClick={wave}>Sign In</Link></p>
