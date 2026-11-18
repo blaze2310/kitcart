@@ -1,0 +1,176 @@
+.kc-profile .kc-dob-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.kc-profile .kc-dob-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(390px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  padding: 0;
+  border-radius: 24px;
+  color: var(--kc-white);
+  color-scheme: dark;
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(175, 181, 255, .35), transparent 61%),
+    linear-gradient(150deg, rgba(54, 69, 130, .93), rgba(19, 32, 74, .96));
+}
+
+.kc-profile .kc-phone-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px 0 4px;
+}
+
+.kc-profile .kc-phone-row:focus-within {
+  border-color: var(--kc-lavender);
+  box-shadow: 0 0 0 3px rgba(168, 162, 255, .19);
+}
+
+.kc-phone-prefix {
+  flex: none;
+  border-inline-end: 1px solid rgba(226, 235, 255, .2);
+  padding-inline-end: 4px;
+}
+
+.kc-phone-prefix-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 64px;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--kc-white);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.kc-phone-prefix-button svg {
+  display: block;
+  flex: none;
+}
+
+.kc-phone-prefix-button:focus-visible {
+  outline: 2px solid var(--kc-cyan);
+  outline-offset: -2px;
+}
+
+.kc-phone-prefix-button:disabled { cursor: default; }
+
+.kc-phone-number {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--kc-white);
+  font: inherit;
+  outline: none;
+}
+
+.kc-phone-number::placeholder { color: #aebada; }
+
+.kc-phone-country-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  max-height: min(39vh, 19rem);
+  overflow-y: auto;
+  padding: 3px;
+  overscroll-behavior: contain;
+}
+
+.kc-phone-country-option {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 162, 255, .26);
+  background: rgba(157, 174, 239, .11);
+  color: #f7f8fc;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kc-phone-country-option:hover,
+.kc-phone-country-option[aria-pressed="true"] {
+  background: rgba(168, 162, 255, .27);
+  border-color: #d0c7ff;
+}
+
+.kc-phone-country-option:focus-visible {
+  outline: 2px solid var(--kc-cyan, #8fe2e8);
+  outline-offset: 1px;
+}
+
+.kc-phone-country-option > :last-child { color: #c8c7ff; white-space: nowrap; }
+
+
+/* Shared by signup and account completion. */
+.kc-phone-country-dialog .kc-dob-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.kc-phone-country-dialog .kc-dob-header {
+  align-items: center;
+  gap: 12px;
+}
+
+.kc-phone-country-dialog .kc-dob-header h2 {
+  min-width: 0;
+  line-height: 1.18;
+}
+
+.kc-phone-country-dialog .kc-phone-country-list {
+  margin-top: 2px;
+}
+
+.kc-phone-country-dialog .kc-input:focus-visible {
+  outline-offset: 2px;
+}
+
+.kc-dob-dialog .kc-dob-icon {
+  flex: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.kc-dob-dialog .kc-dob-icon svg {
+  display: block;
+}
+
+.kc-dob-dialog .kc-dob-controls select {
+  appearance: none;
+  padding-inline: 9px 29px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23e4e8ff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  background-size: 14px 14px;
+  text-overflow: ellipsis;
+}
+
+@media (forced-colors: active) {
+  .kc-dob-dialog .kc-dob-controls select {
+    appearance: auto;
+    padding-inline-end: 4px;
+    background-image: none;
+  }
+}
