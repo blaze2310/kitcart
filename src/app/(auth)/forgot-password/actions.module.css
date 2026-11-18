@@ -1,0 +1,67 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #e5e1ff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action:not(:disabled):is(:hover, :focus-visible) {
+  border-color: #a8a2ff;
+  background: rgba(168, 162, 255, .2);
+  color: #fff;
+}
+
+.action:focus-visible {
+  outline: 2px solid #8fe2e8;
+  outline-offset: 2px;
+}
+
+.action:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.notice {
+  flex: none;
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 198, 158, .45);
+  border-radius: 12px;
+  background: rgba(255, 164, 133, .10);
+  color: #ffe3d6;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  margin-top: 12px;
+  color: #e5e1ff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.footer a:is(:hover, :focus-visible) {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

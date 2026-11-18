@@ -1,83 +1,56 @@
 # KitCart Project Structure
 
-## Application
+KitCart is one Next.js App Router application. Route entry points live in
+`src/app/`, reusable feature code lives in `src/features/`, and runtime
+assets live in `public/`.
 
-src/app/
-- (auth)/: Sign In and Sign Up routes
-- (labs)/: Robot and visor development/testing routes
-- (shop)/: Future e-commerce storefront routes
-- account/: Authenticated account page
-- api/auth/: Auth.js API endpoints
+## Routes and layouts
 
-## Authentication
+- `src/app/(marketplace)/` contains Discover (`/`), Explore, About, Help,
+  and their shared layout and background styles.
+- `src/app/(auth)/` contains Login, Sign Up, and their shared layout.
+- `src/app/(labs)/` contains Aurora, Light Pillar, design, render, robot,
+  and visor test routes.
+- `src/app/account/` contains the account page.
+- `src/app/api/auth/[...nextauth]/` contains the Auth.js API handler.
 
-src/features/auth/
-- components/: AuthShell and CodeSlots
-- styles/: Authentication-specific styles
-- providers/: Reserved for future provider-specific modules
+Parenthesized route groups organize files without changing public URLs.
+The marketplace background lives in the shared layout so it stays mounted
+when navigating between marketplace pages.
 
-src/auth.ts
-- Central Auth.js configuration
+## Features and styles
 
-src/proxy.ts
-- Authentication middleware/proxy
+- `src/features/shop/marketplace/` contains the marketplace shell, demo
+  catalogue, and reusable marketplace styles.
+- `src/features/auth/` contains the authentication shell, verification UI,
+  and auth-specific styles.
+- `src/features/robot/3d/` contains the production robot, animation playback,
+  head tracking, and visor rendering. `src/features/robot/2d/` contains
+  the legacy 2D implementation and experiments.
+- `src/components/` contains shared effects such as Aurora and LightPillar.
+- `src/app/globals.css` and `src/styles/kitcart.css` contain global and
+  shared styles.
 
-## Robot
+## Backend entry points
 
-src/features/robot/
-- 3d/: Main production 3D robot
-- 3d/animation/: Animation registry and playback logic
-- 3d/hooks/: Head tracking and automatic blinking
-- 3d/visor/: Visor rendering and geometry
-- 2d/: Legacy 2D robot components and experimental tools
-- 2d/hooks/: Legacy robot interaction hooks
+- `src/auth.ts` contains the central Auth.js configuration.
+- `src/proxy.ts` is the Next.js proxy entry point.
+- API handlers stay in `src/app/api/`. Secrets stay in local environment
+  files, never in Git.
 
-## Robot assets
+## Assets, tooling, and backups
 
-public/models/kitcart/
-- animations/master/: Original master-rigged GLB
-- animations/stay-in-place/: Stationary robot animations
-- animations/moving/: Movement animations
-- kitcart-final.glb: Earlier model used by rigging scripts
-- kitcart-rig-test.glb: Experimental rig
-- kitcart-arm-rig-experiment.glb: Experimental arm rig
-- kitcart-head-experiment.glb: Experimental head model
-- kitcart-head-map.json: Head mapping output
+- `public/models/kitcart/`, `public/mascot/`, and `public/animations/`
+  contain runtime robot assets. Keep production asset URLs stable.
+- `assets/references/` contains design references.
+- `scripts/robot/` contains rigging, mapping, and preview tools.
+- `backups/` contains recovery snapshots, not live application code.
+  Review snapshots before committing them and leave credentials and
+  environment files out of Git.
 
-public/mascot/
-- Robot image layers and visor mask
+## Local development
 
-## Development scripts
+Start KitCart on port 3000 with `npm run dev -- --port 3000`.
 
-scripts/robot/
-- rigging/: Python rigging and model inspection scripts
-- mapping/: Geometry and component mapping scripts
-- previews/: Generated HTML visualizations
-
-Run development scripts from the project root unless their usage instructions specify otherwise.
-
-## Styles
-
-src/styles/
-- Shared application styles
-
-src/features/auth/styles/
-- Authentication-specific styles
-
-## Future storefront
-
-src/features/shop/
-- home/
-- products/
-- cart/
-- checkout/
-
-## Important conventions
-
-- Keep Next.js page.tsx, layout.tsx and route.ts files in src/app.
-- Keep production robot GLB URLs stable.
-- Centralize OAuth configuration in src/auth.ts.
-- Keep secrets in .env.local, never in Git.
-- Never move production assets without updating every reference.
-- Preserve existing robot expressions and animations.
-- Test login, signup and robot interactions after structural changes.
+After moving route files, run `npx next typegen && npx tsc --noEmit`
+to regenerate route types and check TypeScript.
