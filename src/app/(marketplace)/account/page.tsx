@@ -1,10 +1,16 @@
+import { isValidUsername, USERNAME_MESSAGE } from "@/lib/auth/username";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { auth, signOut } from "@/auth";
-import CleanOAuthHash from "@/features/auth/components/CleanOAuthHash";
+import { connection } from "next/server";
+import Link from "next/link";
+import { ArrowLeft, LogOut } from "lucide-react";
+import { auth } from "@/auth";
+import { signOutToLogin } from "@/features/auth/actions/sign-out";
 import { getDb } from "@/lib/db";
 import { normalizePhone, phoneCountries } from "@/lib/auth/phone-country";
 import ProfileForm, { type FormState } from "./ProfileForm";
+import ProfilePhoto from "./ProfilePhoto";
+import styles from "./account.module.css";
 import "@/features/auth/styles/signup-modal.css";
 import "@/features/auth/styles/profile-phone.css";
 
@@ -50,8 +56,8 @@ async function saveProfile(_previous: FormState, data: FormData): Promise<FormSt
   };
   const error = (message: string) => ({ error: message, values });
 
-  if (!/^[A-Za-z][A-Za-z0-9]{0,49}$/.test(username)) {
-    return error("Choose a username up to 50 characters that starts with a letter and uses only letters and numbers.");
+  if (!isValidUsername(username)) {
+    return error(USERNAME_MESSAGE);
   }
   if (!validBirthDate(dateOfBirth)) {
     return error("Choose a real date of birth between 1 January 1900 and today.");
@@ -117,6 +123,7 @@ async function saveProfile(_previous: FormState, data: FormData): Promise<FormSt
 }
 
 async function AccountContent() {
+  await connection();
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
@@ -126,12 +133,18 @@ async function AccountContent() {
     phone_country_iso2: string | null;
     date_of_birth: string | null;
     email_verified: boolean;
+    display_name: string | null;
+    email: string | null;
+    image_url: string | null;
+    avatar_version: string | null;
   }>(
     `SELECT p.username, p.phone_number AS phone, p.phone_country_iso2,
             to_char(p.date_of_birth, 'YYYY-MM-DD') AS date_of_birth,
-            u.email_verified_at IS NOT NULL AS email_verified
+            u.email_verified_at IS NOT NULL AS email_verified,
+            u.display_name, u.email, u.image_url, a.version AS avatar_version
      FROM public.users AS u
      LEFT JOIN public.user_profiles AS p ON p.user_id = u.id
+     LEFT JOIN public.user_avatars AS a ON a.user_id = u.id
      WHERE u.id = $1 AND u.is_active`,
     [session.user.id],
   );
@@ -141,47 +154,66 @@ async function AccountContent() {
 
   const complete = Boolean(profile.username && profile.phone && profile.phone_country_iso2 && profile.date_of_birth);
 
+  const name = profile.display_name || profile.username || "";
+  const imageUrl = profile.avatar_version ? `/api/account/photo?v=${profile.avatar_version}`
+    : profile.image_url && /^https:\/\//i.test(profile.image_url) ? profile.image_url : null;
+  const fields = [
+    ["Name", name],
+    ["Username", profile.username],
+    ["Email address", profile.email],
+    ["Phone number", profile.phone],
+    ["Date of birth", profile.date_of_birth && new Intl.DateTimeFormat("en-IN", {
+      dateStyle: "long",
+      timeZone: "UTC",
+    }).format(new Date(profile.date_of_birth + "T00:00:00Z"))],
+  ];
+
   return (
-    <main className="kc-profile min-h-screen flex items-center justify-center px-6 py-12">
-      <CleanOAuthHash />
-      <section className="kc-glass rounded-3xl p-8 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold mb-3">
-          {complete ? "Welcome to KitCart!" : "Complete your profile"}
-        </h1>
+    <main className={`kc-profile ${styles.page}`}>
+      <div className={styles.wrap}>
+        <Link href="/" className={styles.back}><ArrowLeft size={16} aria-hidden="true" /> Back to shop</Link>
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>YOUR KITCART ACCOUNT</p>
+            <h1>My profile</h1>
+            <p>See your account details and personalise your profile.</p>
+          </div>
+          <form action={signOutToLogin}>
+            <button className={styles.action} type="submit"><LogOut size={16} aria-hidden="true" /> Log out</button>
+          </form>
+        </header>
 
-        {complete ? (
-          <p className="mb-6 text-sm opacity-75">Signed in as {profile.username}</p>
-        ) : (
-          <>
-            <p className="mb-4 text-sm opacity-75">
-              Add any missing details to finish setting up your KitCart account.
-            </p>
-            <ProfileForm
-              save={saveProfile}
-              initial={{
-                username: profile.username ?? "",
-                phone: profile.phone ?? "",
-                phoneCountry: profile.phone_country_iso2 ?? "",
-                dateOfBirth: profile.date_of_birth ?? "",
-              }}
-              countries={phoneCountries}
-            />
-          </>
-        )}
-
-        {!profile.email_verified && (
-          <p className="mb-4 text-sm opacity-75">Your email is not verified in KitCart yet.</p>
-        )}
-
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button type="submit" className="kc-primary-button">Sign Out</button>
-        </form>
-      </section>
+        <div className={styles.grid}>
+          <section className={styles.card} aria-label="Profile photo">
+            <ProfilePhoto key={session.user.id} name={name} imageUrl={imageUrl} />
+          </section>
+          <section className={`${styles.card} ${styles.details}`} aria-labelledby="profile-details">
+            <h2 id="profile-details">Personal details</h2>
+            {profile.email && !profile.email_verified && <p className={styles.warning}>Your email is not verified in KitCart yet.</p>}
+            <dl className={styles.fields}>
+              {fields.map(([label, value]) => (
+                <div key={label}><dt>{label}</dt><dd>{value || "Not provided"}</dd></div>
+              ))}
+            </dl>
+            {!complete && (
+              <div className={styles.setup}>
+                <h3>Complete your profile</h3>
+                <p className={styles.note}>Add any missing details to finish setting up your KitCart account.</p>
+                <ProfileForm
+                  save={saveProfile}
+                  initial={{
+                    username: profile.username ?? "",
+                    phone: profile.phone ?? "",
+                    phoneCountry: profile.phone_country_iso2 ?? "",
+                    dateOfBirth: profile.date_of_birth ?? "",
+                  }}
+                  countries={phoneCountries}
+                />
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
     </main>
   );
 }

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { isValidUsername, USERNAME_MESSAGE } from "./username";
+
 import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import parsePhoneNumber, { isSupportedCountry, type CountryCode } from "libphonenumber-js/max";
 import type { PoolClient } from "pg";
@@ -48,10 +50,6 @@ function validEmail(email: string) {
   return email.length <= 254 && /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email);
 }
 
-function validUsername(username: string) {
-  return /^[A-Za-z][A-Za-z0-9]{0,49}$/.test(username);
-}
-
 async function assertSignupAvailable(db: SignupLookup, email?: string, username?: string) {
   if (email) {
     const result = await db.query("SELECT 1 FROM public.users WHERE lower(email) = $1 LIMIT 1", [email]);
@@ -73,8 +71,8 @@ export async function checkSignup(input: Record<string, unknown>) {
   const email = hasEmail ? (input.email as string).trim().toLowerCase() : undefined;
   const username = hasUsername ? (input.username as string).trim() : undefined;
   if (email !== undefined && !validEmail(email)) throw new SignupError("Enter a valid email address.", 400, "email");
-  if (username !== undefined && !validUsername(username)) {
-    throw new SignupError("Use 1–50 letters or numbers, starting with a letter.", 400, "username");
+  if (username !== undefined && !isValidUsername(username)) {
+    throw new SignupError(USERNAME_MESSAGE, 400, "username");
   }
   if (!hasEmail && !hasUsername) throw new SignupError("Enter an email or username.");
   await assertSignupAvailable(getDb(), email, username);
@@ -161,7 +159,7 @@ export async function startSignup(input: Record<string, unknown>) {
   const phone = parsed && selected ? phoneDetails(parsed.number, selected) : null;
 
   if (!validEmail(email)) throw new SignupError("Enter a valid email address.", 400, "email");
-  if (!validUsername(username)) throw new SignupError("Use 1–50 letters or numbers, starting with a letter.", 400, "username");
+  if (!isValidUsername(username)) throw new SignupError(USERNAME_MESSAGE, 400, "username");
   if (!phone) throw new SignupError("Choose a country calling code and enter a valid number for that country.");
   if (!validDob(dob)) throw new SignupError("Choose a valid date of birth.");
   if (password !== field("confirmPassword") || !isValidPassword(password)) {

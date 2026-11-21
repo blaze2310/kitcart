@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isValidUsername } from "./username";
 import { getDb } from "../db";
 import { isValidPassword, verifyPassword } from "./password";
 
@@ -11,7 +12,7 @@ export async function authorizeCredentials(input: Partial<Record<string, unknown
   const byEmail = identifier.includes("@");
   const validIdentifier = byEmail
     ? identifier.length <= 254 && /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(identifier)
-    : /^[a-z][a-z0-9]{0,49}$/.test(identifier);
+    : isValidUsername(identifier);
   if (!validIdentifier || !isValidPassword(password)) return null;
 
   const db = await getDb().connect();

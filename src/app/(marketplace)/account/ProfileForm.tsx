@@ -1,5 +1,6 @@
 "use client";
 
+import { USERNAME_PATTERN } from "@/lib/auth/username";
 import { useActionState, useState } from "react";
 import BirthDatePicker from "@/features/auth/components/BirthDatePicker";
 import PhoneCountryPicker, { type PhoneCountry } from "@/features/auth/components/PhoneCountryPicker";
@@ -42,7 +43,7 @@ export default function ProfileForm({
         <input
           id="profile-username" name="username" className="kc-input"
           autoComplete="username" maxLength={50} required
-          pattern="[A-Za-z][A-Za-z0-9]*" defaultValue={state.values.username}
+          pattern={USERNAME_PATTERN} defaultValue={state.values.username}
           readOnly={Boolean(initial.username)}
         />
       </div>

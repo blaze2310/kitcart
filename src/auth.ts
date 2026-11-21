@@ -51,12 +51,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           typeof profile.email === "string" &&
           profile.email.trim().toLowerCase() === email;
 
+        const googleControlsEmail = emailVerified &&
+          (email.endsWith("@gmail.com") || (typeof profile?.hd === "string" && profile.hd.trim().length > 0));
+
         try {
           token.kitcartUserId = await resolveOAuthUser({
             provider,
             providerAccountId,
             email,
             emailVerified,
+            googleControlsEmail,
             displayName: user.name?.trim().slice(0, 150) || null,
             imageUrl: user.image ?? null,
           });

@@ -1,22 +1,27 @@
 import { Suspense } from "react";
+import ProductDescription from "@/features/shop/marketplace/description-format";
+
 import { ArrowLeft, Star } from "lucide-react";
 import { notFound } from "next/navigation";
-import { catalogueProducts, CataloguePreview } from "@/features/shop/marketplace/demo-catalogue";
+import { CataloguePreview } from "@/features/shop/marketplace/demo-catalogue";
 import { MarketplaceLink } from "@/features/shop/marketplace/marketplace-shell";
 import ProductActions from "@/features/shop/marketplace/product-actions";
 import ProductGallery from "@/features/shop/marketplace/product-gallery";
+import { getCatalogueProduct } from "@/lib/catalogue";
 import { getProductDetails } from "@/features/shop/marketplace/product-details";
 import styles from "@/features/shop/marketplace/product-detail.module.css";
 
 type Props = { params: Promise<{ id: string }> };
 
+// Prerender one shell so the shared marketplace layout can resolve its pathname.
+// Product data and all other IDs still resolve on demand.
 export function generateStaticParams() {
-  return catalogueProducts.map(({ id }) => ({ id: String(id) }));
+  return [{ id: "1" }];
 }
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  const product = catalogueProducts.find((item) => String(item.id) === id);
+  const product = await getCatalogueProduct(id);
   return { title: product ? `${product.title} | KitCart` : "Product not found | KitCart" };
 }
 
@@ -30,7 +35,7 @@ export default function ProductPage({ params }: Props) {
 
 async function ProductContent({ params }: Props) {
   const { id } = await params;
-  const product = catalogueProducts.find((item) => String(item.id) === id);
+  const product = await getCatalogueProduct(id);
   if (!product) notFound();
   const details = getProductDetails(product);
 
@@ -53,11 +58,13 @@ async function ProductContent({ params }: Props) {
 
         <section className={styles.panel} aria-labelledby="product-description">
           <h2 id="product-description">About this product</h2>
-          <p>{product.description}</p>
-          <p>{details.description}</p>
+          <div className={styles.descriptionScroll} role="region" aria-label="Product description" tabIndex={0}>
+          <ProductDescription text={product.description} />
+          <ProductDescription text={details.description} />
           <h3>What this demo represents</h3>
           <ul>{details.includes.map((item) => <li key={item}>{item}</li>)}</ul>
-          <div className={styles.priceBlock}>
+          </div>
+<div className={styles.priceBlock}>
             <p className={styles.seller}>Sold by <strong>{product.creator}</strong></p>
             <span className={styles.muted}>Demo price</span>
             <strong className={styles.price}>₹{product.price.toLocaleString("en-IN")}</strong>

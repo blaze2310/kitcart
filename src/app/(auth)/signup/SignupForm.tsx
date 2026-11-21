@@ -1,5 +1,6 @@
 "use client";
 
+import { USERNAME_MESSAGE, USERNAME_PATTERN, isValidUsername } from "@/lib/auth/username";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -90,7 +91,7 @@ export default function SignupForm({ countries }: { countries: PhoneCountry[] })
     event.preventDefault();
     const form = event.currentTarget;
     if (checkingForm.current || dialogRef.current?.open) return;
-    if (!/^[A-Za-z][A-Za-z0-9]{0,49}$/.test(username.trim())) return setNotice("Username must begin with a letter and contain only letters and numbers.");
+    if (!isValidUsername(username.trim())) return setNotice(USERNAME_MESSAGE);
     if (!phoneCountry) return setNotice("Choose your country calling code.");
     if (!isValidBirthDate(dateOfBirth)) {
       setNotice("");
@@ -177,10 +178,10 @@ export default function SignupForm({ countries }: { countries: PhoneCountry[] })
             username: username.trim(),
             password,
             redirect: false,
-            redirectTo: "/account",
+            redirectTo: "/",
           });
           if (session?.ok && !session.error) {
-            window.location.assign("/account");
+            window.location.assign("/");
             return;
           }
         } catch {
@@ -213,7 +214,7 @@ export default function SignupForm({ countries }: { countries: PhoneCountry[] })
             <div className="kc-signup-fields" role="region" aria-label="Sign-up fields">
               <div>
                 <label className="kc-field-label" htmlFor="signup-username">Username</label>
-                <input id="signup-username" name="username" className="kc-input" required maxLength={50}
+                <input id="signup-username" name="username" className="kc-input" required maxLength={50} pattern={USERNAME_PATTERN}
                   autoComplete="username" value={username} readOnly={checking}
                   aria-invalid={!!identityErrors.username} aria-describedby={identityErrors.username ? "signup-username-error" : undefined}
                   onChange={e => updateIdentity("username", e.target.value)} onFocus={() => setUsernameFocused(true)}

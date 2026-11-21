@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
+  Fragment,
   useContext,
   useEffect,
   useRef,
@@ -19,7 +20,6 @@ import {
   Menu,
   Search,
   ShoppingCart,
-  UserRound,
   X,
 } from "lucide-react";
 
@@ -110,7 +110,7 @@ export function MarketplaceSearch({
   );
 }
 
-export default function MarketplaceShell({ children }: { children: ReactNode }) {
+export default function MarketplaceShell({ children, accountControl }: { children: ReactNode; accountControl: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -243,9 +243,7 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
                 <ShoppingCart size={19} aria-hidden="true" />
               </button>
 
-              <Link href="/login" className={styles.navIcon} aria-label="Sign in">
-                <UserRound size={19} aria-hidden="true" />
-              </Link>
+              <Fragment key={pathname}>{accountControl}</Fragment>
 
               <button
                 type="button"
@@ -262,7 +260,6 @@ export default function MarketplaceShell({ children }: { children: ReactNode }) 
           {menuOpen && (
             <nav className={styles.mobileMenu} aria-label="Mobile navigation">
               {navLinks()}
-              <Link href="/login">Sign in</Link>
               <MarketplaceLink href="/sell" onRoute={closeNavigation}>Start selling</MarketplaceLink>
             </nav>
           )}
