@@ -107,3 +107,51 @@
 .mediaCaption { display: grid; }
 .mediaCaption > span { grid-area: 1 / 1; }
 .mediaCaption > span[data-visible="false"] { visibility: hidden; }
+
+/* KitCart product description: shared by all public product pages and seller buyer-preview. */
+.descriptionScroll {
+  min-width: 0;
+  max-block-size: clamp(185px, 20vw, 255px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(154, 226, 234, .75) rgba(16, 42, 60, .24);
+  scrollbar-gutter: stable;
+  padding: 3px 12px 10px 0;
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
+.descriptionScroll:focus-visible {
+  outline: 2px solid #8fe2e8;
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+.descriptionScroll::-webkit-scrollbar { width: 7px; }
+.descriptionScroll::-webkit-scrollbar-thumb { border-radius: 6px; background: rgba(154, 226, 234, .75); }
+.descriptionScroll::-webkit-scrollbar-track { background: rgba(16, 42, 60, .24); }
+@media (max-width: 720px) {
+  .descriptionScroll { max-block-size: 240px; }
+}
+/* Subsection titles remain visible and bold inside the scrolling body. */
+.descriptionFormatted { display: grid; gap: 3px; }
+.descriptionFormatted .descriptionLine { margin: 0 0 4px; line-height: 1.62; white-space: pre-wrap; }
+.descriptionFormatted .descriptionLine strong { font-weight: 850; color: #fff9ef; }
+.descriptionFormatted .descriptionSubheading {
+  font-size: 16px; font-weight: 850; line-height: 1.4;
+  margin: 10px 0 3px; letter-spacing: -.012em; color: #fff9ef;
+}
+.descriptionFormatted .descriptionBullets {
+  list-style: disc; padding-left: 20px; margin: 2px 0 5px;
+}
+.descriptionFormatted .descriptionGap { height: 5px; }
+.descriptionScroll :is(h3,h4,h5,strong) { color: #fff9ef; font-weight: 850; }
+
+/* KITCART_DESCRIPTION_DIVIDERS_V1 */
+/* Between product description and standalone fields such as prerequisites. */
+.descriptionScroll > :is(h3, h4, h5) {
+  border-top: 1px solid rgba(231, 250, 255, .40);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+/* The existing .priceBlock border-top is the only line before Sold by. */

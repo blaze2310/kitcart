@@ -81,7 +81,7 @@ export default function LoginPage() {
     setNotice(`Connecting securely to ${provider === "google" ? "Google" : provider === "github" ? "GitHub" : "Facebook"}...`);
 
     try {
-      await signIn(provider, { redirectTo: "/account" });
+      await signIn(provider, { redirectTo: "/" });
     } catch {
       setConnecting(false);
       setNotice(`Could not start ${provider === "google" ? "Google" : provider === "github" ? "GitHub" : "Facebook"} sign-in. Please try again.`);
@@ -95,11 +95,11 @@ export default function LoginPage() {
     setNotice("Signing in…");
     try {
       const result = await signIn("credentials", {
-        username, password, redirect: false, redirectTo: "/account",
+        username, password, redirect: false, redirectTo: "/",
       });
       if (result?.ok && !result.error) {
         setPassword("");
-        window.location.assign("/account");
+        window.location.assign("/");
         return;
       }
       setNotice("Could not sign in. Check your username or email and your password, or try again later.");

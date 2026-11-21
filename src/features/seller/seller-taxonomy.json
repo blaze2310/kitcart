@@ -1,0 +1,764 @@
+[
+  {
+    "name": "Website & Web Design",
+    "children": [
+      {
+        "name": "Website & Landing Page Templates",
+        "formats": [
+          {
+            "name": "Website source",
+            "extensions": [
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": "Project ZIP: HTML/CSS/JS, React/Next.js source, or supported CMS theme files",
+        "preview": "Actual desktop and mobile screenshots; live site preview if available",
+        "proof": "Working page/navigation demo; show mobile layout and functioning features",
+        "software": "Required browser, framework or CMS version, hosting, packages and paid integrations",
+        "guide": "Unzip or install theme; edit text and images; configure dependencies; run and deploy",
+        "package": "Project files, included assets, README, setup/deployment steps, sample config if needed, licence"
+      },
+      {
+        "name": "UI Kits & Design Files",
+        "formats": [
+          {
+            "name": "Figma",
+            "extensions": [],
+            "links": [
+              "figma"
+            ],
+            "extras": [
+              ".zip"
+            ]
+          },
+          {
+            "name": "Design source",
+            "extensions": [
+              ".sketch",
+              ".ai",
+              ".svg",
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": "Editable Figma copy link or supported Sketch/AI/SVG files; ZIP if several files",
+        "preview": "Real screens, components, color styles, variations and example layouts",
+        "proof": "Demonstrate editing components, replacing assets and exporting; video optional",
+        "software": "Compatible editor and version; fonts, plugins or paid assets if required",
+        "guide": "Open/duplicate file; update colors, fonts and components; export for use",
+        "package": "Editable design files or verified copy link, included assets, brief usage notes, licence"
+      }
+    ]
+  },
+  {
+    "name": "Automation & Workflows",
+    "children": [
+      {
+        "name": "Downloadable Workflow Files",
+        "formats": [
+          {
+            "name": "n8n",
+            "extensions": [
+              ".json"
+            ],
+            "note": "Upload an n8n workflow export and remove credentials."
+          },
+          {
+            "name": "Make",
+            "extensions": [
+              ".json"
+            ],
+            "note": "Upload a Make blueprint export."
+          }
+        ],
+        "delivery": "Import file supported by each platform; e.g. n8n .json or Make blueprint .json",
+        "preview": "Real workflow diagram, actions used and sample input/output",
+        "proof": "Successful run using dummy data; show actual result, not a mockup",
+        "software": "Exact automation platform/version, required apps, API accounts, paid plans and plugins",
+        "guide": "Import file; connect your own accounts; replace placeholders; set trigger; test run",
+        "package": "Workflow import file, setup steps, list of integrations, dummy sample input if needed, troubleshooting notes, licence"
+      },
+      {
+        "name": "Shared Automation Templates",
+        "formats": [
+          {
+            "name": "n8n template",
+            "extensions": [
+              ".pdf",
+              ".md"
+            ],
+            "links": [
+              "n8n"
+            ]
+          },
+          {
+            "name": "Make template",
+            "extensions": [
+              ".pdf",
+              ".md"
+            ],
+            "links": [
+              "make"
+            ]
+          },
+          {
+            "name": "Rebuild instructions",
+            "extensions": [
+              ".pdf",
+              ".md"
+            ]
+          }
+        ],
+        "delivery": "Verified template/duplicate link; detailed rebuild instructions if no import is supported",
+        "preview": "Screenshots of trigger, actions, mappings and end result",
+        "proof": "Demonstrate copied or recreated automation working with sample data",
+        "software": "Platform account and plan; connected apps; sharing/duplication availability",
+        "guide": "Open and copy shared template (or recreate); connect apps; map fields; test and enable",
+        "package": "Working template link or reproducible step-by-step document, example inputs/outputs, licence"
+      },
+      {
+        "name": "Automation Scripts",
+        "formats": [
+          {
+            "name": "Runnable scripts",
+            "extensions": [
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": "ZIP with .py, .js, .gs or other actual script files; config and dependency lists",
+        "preview": "Actual output screenshots, supported tasks and configuration example",
+        "proof": "Record script running successfully with safe example data",
+        "software": "Programming runtime/version, OS, packages, permissions and API access",
+        "guide": "Install requirements; enter own credentials; configure inputs; run or schedule script",
+        "package": "Runnable source, requirements, safe example config, README, sample input/output if relevant, licence"
+      }
+    ]
+  },
+  {
+    "name": "Presentations & Slides",
+    "children": [
+      {
+        "name": "Editable Presentation Templates",
+        "formats": [
+          {
+            "name": "PowerPoint",
+            "extensions": [
+              ".pptx"
+            ]
+          },
+          {
+            "name": "Google Slides",
+            "extensions": [
+              ".pptx"
+            ],
+            "links": [
+              "slides"
+            ]
+          },
+          {
+            "name": "OpenDocument presentation",
+            "extensions": [
+              ".odp"
+            ]
+          }
+        ],
+        "delivery": ".pptx, verified Google Slides copy link or other stated editable format; PDF preview",
+        "preview": "Several actual slides showing fonts, layout, charts and slide count",
+        "proof": "Show a sample slide being edited; animations only if advertised",
+        "software": "PowerPoint, Google Slides or named editor; needed fonts and compatible version",
+        "guide": "Open/duplicate; edit text/images/charts; replace fonts; export",
+        "package": "Editable slides, PDF preview, font/asset list, short editing instructions, licence",
+        "pdfPreview": true
+      }
+    ]
+  },
+  {
+    "name": "Career & Professional Documents",
+    "children": [
+      {
+        "name": "Professional Document Templates",
+        "formats": [
+          {
+            "name": "Word",
+            "extensions": [
+              ".docx"
+            ],
+            "extras": [
+              ".pdf",
+              ".xlsx"
+            ]
+          },
+          {
+            "name": "Google Docs",
+            "extensions": [],
+            "links": [
+              "docs"
+            ],
+            "extras": [
+              ".pdf",
+              ".xlsx"
+            ]
+          }
+        ],
+        "delivery": ".docx, verified document copy link, sample .pdf; .xlsx if tracker included",
+        "preview": "Blank and filled example pages; show layout clearly",
+        "proof": "Show editable fields or working tracker; no video needed for simple documents",
+        "software": "Compatible word processor or spreadsheet app; fonts and language",
+        "guide": "Open/duplicate; replace sample details; adjust formatting; save or export as PDF",
+        "package": "Editable blank document, filled example, short instructions, tracker if promised, licence"
+      }
+    ]
+  },
+  {
+    "name": "Dashboards & Data Visualization",
+    "children": [
+      {
+        "name": "BI Dashboard Templates",
+        "formats": [
+          {
+            "name": "Power BI",
+            "extensions": [
+              ".pbix"
+            ],
+            "extras": [
+              ".csv"
+            ]
+          },
+          {
+            "name": "Tableau",
+            "extensions": [
+              ".twbx"
+            ],
+            "extras": [
+              ".csv"
+            ]
+          },
+          {
+            "name": "Looker Studio",
+            "extensions": [],
+            "links": [
+              "looker"
+            ],
+            "extras": [
+              ".csv"
+            ]
+          }
+        ],
+        "delivery": "Platform-native BI project (.pbix, .twbx etc.) or supported copy link; sample .csv",
+        "preview": "Real KPI screens, filters, charts and example report pages",
+        "proof": "Use filters, change sample data and show a real refresh",
+        "software": "BI platform/version, account tier, data schema, connectors and licences",
+        "guide": "Open/import; connect sample or own data; map fields; refresh; share if supported",
+        "package": "Dashboard project or verified copy link, sample dataset, field definitions, setup/refresh guide, licence",
+        "requiredExtra": ".csv"
+      },
+      {
+        "name": "Code-Based Dashboards",
+        "formats": [
+          {
+            "name": "Dashboard source",
+            "extensions": [
+              ".zip"
+            ],
+            "extras": [
+              ".csv",
+              ".json"
+            ]
+          }
+        ],
+        "delivery": "ZIP source project (Python/JS/TS), requirements or package file, example data",
+        "preview": "Live app screenshot, charts, controls and phone layout if responsive",
+        "proof": "Running dashboard with changing filters or sample inputs",
+        "software": "Runtime/framework versions, dependencies, hosting and database if used",
+        "guide": "Install packages; configure environment; load data; run locally or deploy",
+        "package": "Full source project, dependencies, sample data/config, setup and deployment guide, licence"
+      }
+    ]
+  },
+  {
+    "name": "Trading Strategies & Scripts",
+    "children": [
+      {
+        "name": "Trading Indicators & Signals",
+        "formats": [
+          {
+            "name": "TradingView Pine Script",
+            "extensions": [
+              ".pine",
+              ".txt"
+            ]
+          },
+          {
+            "name": "MetaTrader 4",
+            "extensions": [
+              ".mq4"
+            ],
+            "extras": [
+              ".set"
+            ]
+          },
+          {
+            "name": "MetaTrader 5",
+            "extensions": [
+              ".mq5"
+            ],
+            "extras": [
+              ".set"
+            ]
+          }
+        ],
+        "delivery": "Supported platform indicator source: Pine Script, .mq4/.mq5 or equivalent; preset files",
+        "preview": "Actual chart screenshots, indicator settings and example signals",
+        "proof": "Indicator running on compatible platform with historical/demo charts",
+        "software": "Trading platform/version, supported instruments, timeframe and data/feed requirements",
+        "guide": "Load or compile indicator; apply to chart; set parameters and alerts",
+        "package": "Indicator file/source, settings, example chart, instructions, limitations/risk disclosure, licence"
+      },
+      {
+        "name": "Trading Strategies & Bots",
+        "formats": [
+          {
+            "name": "TradingView Pine Script",
+            "extensions": [
+              ".pine",
+              ".txt"
+            ]
+          },
+          {
+            "name": "MetaTrader 4",
+            "extensions": [
+              ".mq4"
+            ],
+            "extras": [
+              ".set",
+              ".pdf",
+              ".csv"
+            ]
+          },
+          {
+            "name": "MetaTrader 5",
+            "extensions": [
+              ".mq5"
+            ],
+            "extras": [
+              ".set",
+              ".pdf",
+              ".csv"
+            ]
+          },
+          {
+            "name": "Python",
+            "extensions": [
+              ".py",
+              ".zip"
+            ],
+            "extras": [
+              ".json",
+              ".csv",
+              ".pdf"
+            ]
+          }
+        ],
+        "delivery": "Platform strategy/EA files or Python strategy source; required config files",
+        "preview": "Actual strategy settings, sample trades and backtest report with dates",
+        "proof": "Repeatable historical backtest or demo-account run; explain assumptions",
+        "software": "Platform/version, broker/API constraints, data, demo account and risk settings",
+        "guide": "Install/compile; configure; backtest; test with demo funds; set safeguards",
+        "package": "Strategy/bot source, setup/config, documented backtest assumptions, risk notes, licence"
+      }
+    ]
+  },
+  {
+    "name": "Ebooks & Guides",
+    "children": [
+      {
+        "name": "Ebooks & Instruction Guides",
+        "formats": [
+          {
+            "name": "Ebook or guide",
+            "extensions": [
+              ".pdf",
+              ".epub"
+            ],
+            "extras": [
+              ".pdf",
+              ".xlsx",
+              ".csv",
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": ".pdf or .epub; worksheets/reference files when promised",
+        "preview": "Cover, contents and substantial sample pages",
+        "proof": "Preview chapter or exercise; recorded demo usually unnecessary",
+        "software": "PDF/EPUB reader, language; software used by any included exercises",
+        "guide": "How to open/read; where to find worksheets, links and supporting files",
+        "package": "Full ebook/guide, promised exercises/references, reader or usage notes, licence"
+      }
+    ]
+  },
+  {
+    "name": "AI Video & Prompt Packs",
+    "children": [
+      {
+        "name": "AI Prompt Packs",
+        "formats": [
+          {
+            "name": "Prompt pack",
+            "extensions": [
+              ".txt",
+              ".md",
+              ".csv",
+              ".json",
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": ".txt, .md, .csv or .json prompt files; ZIP for multiple files",
+        "preview": "Real sample prompts and clearly labelled generated example outputs",
+        "proof": "One tested example showing prompt, settings and actual output",
+        "software": "Supported AI platform/model, plan/API costs and version/settings",
+        "guide": "Copy/import prompts; replace variables; select model/settings; adapt outputs",
+        "package": "Complete prompt library, prompt index, example results, usage instructions, licence"
+      }
+    ]
+  },
+  {
+    "name": "Spreadsheets & Calculators",
+    "children": [
+      {
+        "name": "Spreadsheet & Calculator Templates",
+        "formats": [
+          {
+            "name": "Excel",
+            "extensions": [
+              ".xlsx",
+              ".xlsm"
+            ]
+          },
+          {
+            "name": "LibreOffice Calc",
+            "extensions": [
+              ".ods"
+            ]
+          },
+          {
+            "name": "Google Sheets",
+            "extensions": [],
+            "links": [
+              "sheets"
+            ]
+          }
+        ],
+        "delivery": ".xlsx or .ods workbook; verified Google Sheets copy link; macro files only if needed",
+        "preview": "Blank and filled sheet screenshots; dashboard and formula result examples",
+        "proof": "Change an input and show the correct calculated result",
+        "software": "Excel/Google Sheets version, locale, required add-ons or scripts",
+        "guide": "Open/copy workbook; enter inputs; edit formulas/labels if needed; read results",
+        "package": "Editable workbook or copy link, filled sample, short instructions, formula notes, licence"
+      }
+    ]
+  },
+  {
+    "name": "Social Media & Marketing Assets",
+    "children": [
+      {
+        "name": "Editable Marketing Design Templates",
+        "formats": [
+          {
+            "name": "Canva",
+            "extensions": [],
+            "links": [
+              "canva"
+            ],
+            "extras": [
+              ".png",
+              ".jpg",
+              ".jpeg"
+            ]
+          },
+          {
+            "name": "Figma",
+            "extensions": [],
+            "links": [
+              "figma"
+            ],
+            "extras": [
+              ".png",
+              ".jpg",
+              ".jpeg"
+            ]
+          },
+          {
+            "name": "Editable design source",
+            "extensions": [
+              ".psd",
+              ".ai",
+              ".svg",
+              ".zip"
+            ],
+            "extras": [
+              ".png",
+              ".jpg",
+              ".jpeg"
+            ]
+          }
+        ],
+        "delivery": "Canva/Figma copy link or editable PSD/AI/SVG files; promised PNG/JPG exports",
+        "preview": "Real post, ad and story mockups; include sizes and variations",
+        "proof": "Show text/photo editing and exporting in supported tool",
+        "software": "Required design app/account tier, fonts, image rights and target dimensions",
+        "guide": "Duplicate/open; replace logo, text and images; adjust size; export",
+        "package": "Editable design files/link, promised exports, size specifications, editing notes, licence"
+      },
+      {
+        "name": "Marketing Content & Copy Kits",
+        "formats": [
+          {
+            "name": "Copy kit",
+            "extensions": [
+              ".docx",
+              ".txt",
+              ".md",
+              ".csv"
+            ],
+            "extras": [
+              ".xlsx"
+            ]
+          }
+        ],
+        "delivery": ".docx, .txt, .md, .csv; .xlsx if content calendar included",
+        "preview": "Sample captions, campaign sequences, emails and calendar extract",
+        "proof": "Show finished example or a filled template; video not required",
+        "software": "Document/spreadsheet editor; target channel and posting limits",
+        "guide": "Pick content; replace placeholders and brand voice; schedule via own platform",
+        "package": "Full copy/content pack, calendar if offered, customization guide, examples, licence"
+      }
+    ]
+  },
+  {
+    "name": "Graphic Design & Creative Assets",
+    "children": [
+      {
+        "name": "2D Graphic Assets & Mockups",
+        "formats": [
+          {
+            "name": "2D graphics",
+            "extensions": [
+              ".svg",
+              ".png",
+              ".jpg",
+              ".jpeg",
+              ".psd",
+              ".ai",
+              ".eps",
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": ".svg, .png, .jpg, .psd, .ai or .eps; ZIP bundles",
+        "preview": "Clear asset sheet, variations, sample mockup and dimensions",
+        "proof": "Show a real editable layer or mockup replacement if advertised",
+        "software": "Compatible design/editor version, included fonts, required plugins",
+        "guide": "Open; edit shapes/layers or smart objects; export for use",
+        "package": "All advertised assets, editable sources where promised, exports, brief usage notes, licence"
+      },
+      {
+        "name": "Fonts, Presets & LUTs",
+        "formats": [
+          {
+            "name": "Font",
+            "extensions": [
+              ".otf",
+              ".ttf",
+              ".zip"
+            ]
+          },
+          {
+            "name": "Photo preset",
+            "extensions": [
+              ".xmp",
+              ".dng",
+              ".zip"
+            ]
+          },
+          {
+            "name": "Video LUT",
+            "extensions": [
+              ".cube",
+              ".zip"
+            ]
+          }
+        ],
+        "delivery": ".otf/.ttf fonts, .xmp/.dng presets, .cube LUTs, as appropriate",
+        "preview": "Font specimen or genuine before/after image/video comparisons",
+        "proof": "Show file installed/applied to real sample content",
+        "software": "Supported design/photo/video program and version; appropriate install rights",
+        "guide": "Install font or import preset/LUT; apply and adjust to own content",
+        "package": "Original font/preset/LUT files, sample previews, install steps, usage licence"
+      },
+      {
+        "name": "3D Models",
+        "formats": [
+          {
+            "name": "3D model",
+            "extensions": [
+              ".blend",
+              ".glb",
+              ".gltf",
+              ".fbx",
+              ".obj",
+              ".stl",
+              ".zip"
+            ],
+            "extras": [
+              ".png",
+              ".jpg",
+              ".jpeg",
+              ".webp",
+              ".mtl"
+            ]
+          }
+        ],
+        "delivery": ".blend, .glb/.gltf, .fbx, .obj, .stl and texture maps as advertised",
+        "preview": "Multiple-angle renders, wireframe, polygon/material information",
+        "proof": "Turntable or rotating viewport; import proof when compatibility matters",
+        "software": "Compatible 3D program/version, engine, units, texture support",
+        "guide": "Import; link textures; adjust scale/materials; render or export",
+        "package": "Advertised model formats, required textures/materials, specs, import instructions, licence"
+      }
+    ]
+  },
+  {
+    "name": "Code & Developer Resources",
+    "children": [
+      {
+        "name": "Code Snippets & Libraries",
+        "formats": [
+          {
+            "name": "Code or library",
+            "extensions": [
+              ".py",
+              ".js",
+              ".ts",
+              ".jsx",
+              ".tsx",
+              ".gs",
+              ".json",
+              ".zip",
+              ".tgz"
+            ]
+          }
+        ],
+        "delivery": "Source files/package or ZIP; dependency manifest, examples and tests",
+        "preview": "Actual code sample, API/use example and output",
+        "proof": "Execute a simple working example or test; screenshots acceptable",
+        "software": "Runtime/language versions, OS restrictions, dependencies",
+        "guide": "Install dependencies; import code; configure; run supplied example",
+        "package": "Full code, package manifest, usable example, tests where relevant, README/API notes, licence"
+      },
+      {
+        "name": "Starter Projects & Developer Tools",
+        "formats": [
+          {
+            "name": "Complete project or tool",
+            "extensions": [
+              ".zip",
+              ".tgz"
+            ]
+          }
+        ],
+        "delivery": "Complete project ZIP/repo export; CLI source, configs, migrations and tests if used",
+        "preview": "Project structure, working output/interface and example commands",
+        "proof": "Fresh install and execution of main functionality",
+        "software": "Runtime/OS, framework, database, services and any API costs",
+        "guide": "Install; set safe environment variables; initialize database if needed; run/test/deploy",
+        "package": "Full project/tool, sample env (no keys), dependencies, relevant migrations/tests, setup guide, licence"
+      }
+    ]
+  },
+  {
+    "name": "No-Code & App Templates",
+    "children": [
+      {
+        "name": "Workspace & Database Templates",
+        "formats": [
+          {
+            "name": "Notion",
+            "extensions": [
+              ".csv",
+              ".json"
+            ],
+            "links": [
+              "notion"
+            ]
+          },
+          {
+            "name": "Airtable",
+            "extensions": [
+              ".csv",
+              ".json"
+            ],
+            "links": [
+              "airtable"
+            ]
+          }
+        ],
+        "delivery": "Verified Notion/Airtable duplicate link or supported CSV/JSON export",
+        "preview": "Real database views, templates, tables and example dashboards",
+        "proof": "Demonstrate duplicating and editing the workspace with dummy records",
+        "software": "Required platform account/plan, duplication permissions and integrations",
+        "guide": "Duplicate/import; replace sample records; connect fields and permissions",
+        "package": "Working template link/export, table/schema notes, dummy sample data, setup guide, licence"
+      },
+      {
+        "name": "No-Code App Templates",
+        "formats": [
+          {
+            "name": "Bubble",
+            "extensions": [],
+            "links": [
+              "bubble"
+            ],
+            "extras": [
+              ".csv",
+              ".json"
+            ]
+          },
+          {
+            "name": "FlutterFlow",
+            "extensions": [
+              ".zip"
+            ],
+            "links": [
+              "flutterflow"
+            ],
+            "extras": [
+              ".csv",
+              ".json"
+            ]
+          },
+          {
+            "name": "Glide",
+            "extensions": [],
+            "links": [
+              "glide"
+            ],
+            "extras": [
+              ".csv",
+              ".json"
+            ]
+          }
+        ],
+        "delivery": "Verified app clone/link or actual platform-supported export; schema/sample data",
+        "preview": "Real screens, forms, user journeys and responsive behavior",
+        "proof": "Working app flow: navigate, submit form, see data update",
+        "software": "Supported Bubble/FlutterFlow/Glide etc. plan, connectors, hosting and permissions",
+        "guide": "Clone/import; connect data; configure accounts/APIs; test and deploy",
+        "package": "Usable clone/export, schema/sample data, integration and launch instructions, licence"
+      }
+    ]
+  }
+]

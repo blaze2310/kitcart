@@ -1,46 +1,32 @@
 import { Suspense } from "react";
 import { Search } from "lucide-react";
 
-import { ProductCard, catalogueCategories, catalogueProducts } from "@/features/shop/marketplace/demo-catalogue";
+import { ProductCard } from "@/features/shop/marketplace/demo-catalogue";
 import ExploreFilters from "@/features/shop/marketplace/explore-filters";
 import { MarketplaceLink } from "@/features/shop/marketplace/marketplace-shell";
 import styles from "@/features/shop/marketplace/home.module.css";
 import shellStyles from "@/features/shop/marketplace/marketplace-shell.module.css";
 
-const PAGE_SIZE = 12;
+import { findCataloguePage, getCatalogueGroups } from "@/lib/catalogue";
 type Parameter = string | string[] | undefined;
 type Query = Promise<{ q?: Parameter; category?: Parameter; subcategory?: Parameter; page?: Parameter }>;
-
-const groups = catalogueCategories.map((name) => ({
-  name,
-  children: [...new Set(catalogueProducts.filter((product) => product.group === name).map((product) => product.subcategory))],
-}));
 
 function values(value: Parameter) {
   return (Array.isArray(value) ? value : value ? [value] : []).map((item) => item.trim()).filter(Boolean);
 }
 
 async function Catalogue({ searchParams }: { searchParams: Query }) {
-  const params = await searchParams;
-  const query = values(params.q)[0] ?? "";
+  const [params, groups] = await Promise.all([searchParams, getCatalogueGroups()]);
+  const query = (values(params.q)[0] ?? "").slice(0, 160);
   const requestedCategories = new Set(values(params.category));
-  const categories = catalogueCategories.filter((name) => requestedCategories.has(name));
+  const categories = groups.map(({ name }) => name).filter((name) => requestedCategories.has(name));
   const allowedGroups = groups.filter(({ name }) => !categories.length || categories.includes(name));
   const requestedSubcategories = new Set(values(params.subcategory));
   const subcategories = allowedGroups.flatMap(({ children }) => children).filter((name) => requestedSubcategories.has(name));
-  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-
-  const matches = catalogueProducts.filter((product) => {
-    const text = [product.title, product.group, product.subcategory, product.category,
-      product.creator, product.description].join(" ").toLowerCase();
-    return (!categories.length || categories.includes(product.group)) &&
-      (!subcategories.length || subcategories.includes(product.subcategory)) &&
-      terms.every((term) => text.includes(term));
+  const { products: visible, total, page: pageNumber, totalPages } = await findCataloguePage({
+    query, categories, subcategories,
+    requestedPage: Number.parseInt(values(params.page)[0] ?? "", 10) || 1,
   });
-
-  const totalPages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
-  const pageNumber = Math.max(1, Math.min(totalPages, Number.parseInt(values(params.page)[0] ?? "", 10) || 1));
-  const visible = matches.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
   const title = subcategories.length === 1 ? subcategories[0]
     : categories.length === 1 && !subcategories.length ? categories[0]
     : query ? "Search results" : "Demo products";
@@ -62,7 +48,7 @@ async function Catalogue({ searchParams }: { searchParams: Query }) {
         <div className={styles.sectionHeading}>
           <div>
             <h2 id="explore-results">{title}</h2>
-            <p>{matches.length} demo {matches.length === 1 ? "product" : "products"}{query ? ` matching “${query}”` : ""}</p>
+            <p>{total} demo {total === 1 ? "product" : "products"}{query ? ` matching “${query}”` : ""}</p>
           </div>
           {(query || categories.length > 0 || subcategories.length > 0) && (
             <MarketplaceLink href="/explore" className={styles.infoLink}>Clear filters</MarketplaceLink>
@@ -100,7 +86,7 @@ export default function ExplorePage({ searchParams }: { searchParams: Query }) {
         <div>
           <span className={styles.eyebrow}>EXPLORE YOUR POSSIBILITIES</span>
           <h1>Explore digital products</h1>
-          <p>Browse 13 categories and 23 subcategories in the demo catalogue.</p>
+          <p>Browse the demo catalogue by category, or search for a product.</p>
         </div>
       </div>
       <Suspense fallback={<p role="status">Loading demo products…</p>}>
