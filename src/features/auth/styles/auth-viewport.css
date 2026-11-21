@@ -1,0 +1,144 @@
+/* Login and signup only. Do not rely on Tailwind's browser reset. */
+body:has(.kc-auth) {
+  margin: 0;
+}
+
+.kc-auth,
+.kc-auth *,
+.kc-auth *::before,
+.kc-auth *::after {
+  box-sizing: border-box;
+}
+
+.kc-auth {
+  min-height: 100dvh;
+}
+
+.kc-auth :is(button, input) {
+  font-family: inherit;
+}
+
+.kc-auth .kc-auth-card {
+  min-width: 0;
+  justify-self: center;
+}
+
+.kc-auth .kc-form > div,
+.kc-auth .kc-password,
+.kc-auth .kc-input {
+  min-width: 0;
+}
+
+.kc-auth .kc-input {
+  display: block;
+  max-width: 100%;
+}
+
+.kc-auth .kc-password > .kc-eye {
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+}
+
+.kc-auth :is(.kc-footer, .kc-notice) {
+  margin-bottom: 0;
+}
+
+.kc-auth .kc-password-label {
+  position: relative;
+}
+
+.kc-auth .kc-password-info {
+  position: static;
+}
+
+.kc-auth .kc-info-trigger {
+  padding: 0;
+  border: 1px solid rgba(209, 213, 255, .4);
+  background: rgba(168, 162, 255, .12);
+}
+
+.kc-auth .kc-password-tooltip {
+  left: 0;
+  bottom: 100%;
+  width: min(280px, 100%);
+}
+
+.kc-auth dialog.kc-otp-dialog {
+  position: fixed;
+}
+
+@media (min-width: 921px) and (min-height: 640px) {
+  body:has(.kc-auth) {
+    overflow: hidden;
+  }
+
+  .kc-auth {
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .kc-auth .kc-layout {
+    width: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    padding-block: 16px;
+    align-items: safe center;
+    overflow-y: auto;
+  }
+
+  .kc-auth .kc-robot-stage {
+    height: clamp(220px, calc(100dvh - 235px), 580px);
+  }
+}
+
+@media (min-width: 921px) and (max-height: 900px) {
+  .kc-auth .kc-nav-inner {
+    height: 60px;
+  }
+
+  .kc-auth .kc-auth-card {
+    padding-block: clamp(16px, 2.7dvh, 26px);
+  }
+
+  .kc-auth .kc-heading {
+    font-size: clamp(28px, 4.5dvh, 38px);
+  }
+
+  .kc-auth .kc-form {
+    gap: 9px;
+  }
+
+  .kc-auth .kc-signup-form {
+    margin-top: 13px;
+  }
+
+  .kc-auth .kc-field-label {
+    margin-bottom: 5px;
+  }
+
+  .kc-auth .kc-password-label .kc-field-label {
+    margin-bottom: 0;
+  }
+
+  .kc-auth :is(.kc-input, .kc-social) {
+    height: 40px;
+  }
+
+  .kc-auth .kc-auth-card .kc-primary-button {
+    min-height: 43px;
+  }
+
+  .kc-auth .kc-social-row {
+    margin-top: 14px;
+  }
+
+  .kc-auth .kc-divider {
+    margin-block: 12px;
+  }
+
+  .kc-auth :is(.kc-footer, .kc-notice) {
+    margin-top: 10px;
+  }
+}

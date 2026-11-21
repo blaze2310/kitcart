@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import {
@@ -58,9 +58,7 @@ function ProviderIcon({ name }: { name: Provider }) {
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [notice, setNotice] = useState(
-    "Google, GitHub and Facebook sign-in are available. Username/password sign-in is coming later."
-  );
+  const [notice, setNotice] = useState("");
   const [connecting, setConnecting] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -83,12 +81,33 @@ export default function LoginPage() {
     setNotice(`Connecting securely to ${provider === "google" ? "Google" : provider === "github" ? "GitHub" : "Facebook"}...`);
 
     try {
-      await signIn(provider, { redirectTo: "/account" });
+      await signIn(provider, { redirectTo: "/" });
     } catch {
       setConnecting(false);
       setNotice(`Could not start ${provider === "google" ? "Google" : provider === "github" ? "GitHub" : "Facebook"} sign-in. Please try again.`);
     }
   };
+
+  async function submitCredentials(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (connecting) return;
+    setConnecting(true);
+    setNotice("Signing in…");
+    try {
+      const result = await signIn("credentials", {
+        username, password, redirect: false, redirectTo: "/",
+      });
+      if (result?.ok && !result.error) {
+        setPassword("");
+        window.location.assign("/");
+        return;
+      }
+      setNotice("Could not sign in. Check your username or email and your password, or try again later.");
+    } catch {
+      setNotice("Could not reach KitCart. Please try again.");
+    }
+    setConnecting(false);
+  }
 
   return (
     <section
@@ -131,17 +150,11 @@ export default function LoginPage() {
 
       <form
         className="kc-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          wave();
-          setNotice(
-            "Username/password authentication will be connected when we build the database backend."
-          );
-        }}
+        onSubmit={submitCredentials}
       >
         <div>
           <label className="kc-field-label" htmlFor="kitcart-username">
-            Username
+            Username or email
           </label>
           <input
             className="kc-input"
@@ -153,7 +166,10 @@ export default function LoginPage() {
             onChange={(event) => setUsername(event.target.value)}
             onFocus={() => setUsernameFocused(true)}
             onBlur={() => setUsernameFocused(false)}
-            placeholder="Enter username"
+            placeholder="Enter username or email"
+            maxLength={254}
+            autoCapitalize="none"
+            spellCheck={false}
           />
         </div>
 
@@ -189,19 +205,14 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button
-          className="kc-forgot"
-          type="button"
-          disabled
-          title="Password recovery is not connected"
-        >
+        <Link className="kc-forgot" href="/forgot-password">
           Forgot password?
-        </button>
+        </Link>
 
         <button
           className="kc-primary-button"
           type="submit"
-          title="Username/password authentication is not connected yet"
+          disabled={connecting}
         >
           <LockKeyhole size={17} />
           Sign In

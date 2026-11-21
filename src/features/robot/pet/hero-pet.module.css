@@ -1,0 +1,44 @@
+.stage { position: relative; width: 100%; height: 62px; align-self: center; pointer-events: none; }
+.actor {
+  position: fixed; top: 0; left: 0;
+  width: 160px; height: 140px;
+  z-index: 10; pointer-events: none;
+}
+.actor[hidden] { display: block; visibility: hidden; }
+/* Transparent overscan lets tall/wide poses fit without zooming the pet out. */
+.canvas { position: absolute; inset: -54px -50px; pointer-events: none; }
+.hit {
+  position: absolute; top: 10%; left: 50%; width: 94px; height: 88%;
+  transform: translateX(-50%); pointer-events: auto; touch-action: none;
+  background: transparent; border: 0; border-radius: 14px; color: white;
+  cursor: grab;
+}
+.hit:active { cursor: grabbing; }
+.hit[data-rotate="true"] { cursor: move; }
+.menu button[aria-pressed="true"] { border-color: #a6faff; background: #296078; }
+.menu small { color: #bce1ed; }
+.controls { position: absolute; left: 50%; top: 141px; transform: translateX(-50%); z-index: 2; pointer-events: auto; }
+.controls > button, .menu button, .menu select {
+  min-height: 22px; border: 1px solid #c5f2fa8c; border-radius: 8px;
+  padding: 2px 6px; color: #f4fbff; background: #17384bef; font: inherit; font-size: 12px;
+}
+.controls > button { white-space: nowrap; font-size: 11px; }
+.menu {
+  position: absolute; top: calc(100% + 6px); left: 0;
+  display: grid; gap: 8px; padding: 10px; width: min(232px, calc(100vw - 50px));
+  border: 1px solid #d6f7ff91; border-radius: 12px; background: #132c41f7; color: #f0fcff;
+  box-shadow: 0 12px 25px #00122491; font-size: 12px; pointer-events: auto;
+}
+.menu label { display: grid; gap: 4px; }
+.menu select { width: 100%; min-width: 0; color-scheme: dark; }
+.menuButtons { display: flex; flex-wrap: wrap; gap: 6px; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: #d7f4ff; font-size: 12px; }
+@media (max-width: 600px) {
+  .actor { width: min(160px, 42vw); }
+  .hit { width: min(94px, 25vw); }
+  .stage { height: 56px; }
+  .menu { width: min(220px, calc(100vw - 64px)); }
+}
+@media (max-width: 380px) {
+  .hit { width: min(94px, 24vw); }
+}
